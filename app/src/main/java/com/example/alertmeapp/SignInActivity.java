@@ -5,9 +5,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SignInActivity extends AppCompatActivity {
+    private final String INVALID_EMAIL = "Email invalid";
+    //TODO: provide useful error message for invalid password
+    private final String INVALID_PASSWORD = "Password invalid";
     private final String SIGN_UP_INFO =  "Or sign up here";
     private final int INT_START = 11;
     private final int INT_END = 15;
@@ -45,7 +48,7 @@ public class SignInActivity extends AppCompatActivity {
                 } else {
                     ds.setColor(Color.BLACK);
                 }
-            }
+            };
         };
 
         SpannableString str = new SpannableString (SIGN_UP_INFO);
@@ -55,8 +58,42 @@ public class SignInActivity extends AppCompatActivity {
         singUpInfo.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
-    public void onSingInClick(View view) {
-        //TODO: Credentials validation
-        startActivity(new Intent(this, MapsActivity.class));
+    public void onSignInClick(View view) {
+        EditText emailElement = findViewById(R.id.sign_in_email);
+        String email = emailElement.getText().toString();
+        EditText passwordElement = findViewById(R.id.sign_in_password);
+        String password = passwordElement.getText().toString();
+
+        boolean emailValid = validateEmail(email);
+        boolean passwordValid = validatePassword(password);
+        TextView emailInvalidElement = findViewById(R.id.emailInvalid);
+        TextView passwordInvalidElement = findViewById(R.id.passwordInvalid);
+
+        if (emailValid) {
+            emailInvalidElement.setText("");
+        } else {
+            emailInvalidElement.setText(INVALID_EMAIL);
+        }
+
+        if (passwordValid) {
+            passwordInvalidElement.setText("");
+        } else {
+            passwordInvalidElement.setText(INVALID_PASSWORD);
+        }
+
+        //TODO: Credentials validation on server
+        if (emailValid && passwordValid) {
+            startActivity(new Intent(this, MapsActivity.class));
+        }
     }
+
+    public boolean validateEmail(String email) {
+        return !email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    public boolean validatePassword(String password) {
+        //TODO: Change validation based on database constraints
+        return !password.isEmpty();
+    }
+
 }

@@ -18,13 +18,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="128dp"
+        android:contentDescription="@string/alertme_logo"
         android:minWidth="96dp"
         android:minHeight="96dp"
         android:src="@mipmap/ic_launcher_round"
-        android:contentDescription="@string/alertme_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +36,7 @@
         android:id="@+id/sign_in_email"
         android:layout_width="288dp"
         android:layout_height="48dp"
-        android:layout_marginTop="300dp"
+        android:layout_marginTop="284dp"
         android:ems="10"
         android:hint="@string/email_hint"
         android:inputType="textEmailAddress"
@@ -43,6 +44,16 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/emailInvalid"
+        android:layout_width="289dp"
+        android:layout_height="19dp"
+        android:textColor="@color/red"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_email" />
 
     <EditText
         android:id="@+id/sign_in_password"
@@ -57,13 +68,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/passwordInvalid"
+        android:layout_width="289dp"
+        android:layout_height="19dp"
+        android:textColor="@color/red"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_password" />
+
     <android.widget.Button
         android:id="@+id/sign_in_button"
         android:layout_width="301dp"
         android:layout_height="51dp"
         android:layout_marginBottom="160dp"
         android:background="@drawable/button_background"
-        android:onClick="onSingInClick"
+        android:onClick="onSignInClick"
         android:text="@string/sing_in_button_text"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -79,5 +101,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
