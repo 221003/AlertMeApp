@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AlertMeApp</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
