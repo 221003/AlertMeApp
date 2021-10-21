@@ -15,6 +15,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.alertmeapp.api.AlertMeService;
+import com.example.alertmeapp.api.LoginBody;
+import com.example.alertmeapp.api.RestAdapter;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class SignInActivity extends AppCompatActivity {
     private final String INVALID_EMAIL = "Email invalid";
     //TODO: provide useful error message for invalid password
@@ -65,7 +74,7 @@ public class SignInActivity extends AppCompatActivity {
         String password = passwordElement.getText().toString();
 
         boolean emailValid = validateEmail(email);
-        boolean passwordValid = validatePassword(password);
+      //  boolean passwordValid = validatePassword(password);
         TextView emailInvalidElement = findViewById(R.id.emailInvalid);
         TextView passwordInvalidElement = findViewById(R.id.passwordInvalid);
 
@@ -75,25 +84,48 @@ public class SignInActivity extends AppCompatActivity {
             emailInvalidElement.setText(INVALID_EMAIL);
         }
 
-        if (passwordValid) {
-            passwordInvalidElement.setText("");
-        } else {
-            passwordInvalidElement.setText(INVALID_PASSWORD);
-        }
+//        if (passwordValid) {
+//            passwordInvalidElement.setText("");
+//        } else {
+//            passwordInvalidElement.setText(INVALID_PASSWORD);
+//        }
+
+        AlertMeService service = RestAdapter.getAPIClient();
+        Call<ResponseBody> call = service.login(new LoginBody(email, password));
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()){
+                    emailInvalidElement.setText("");
+                    passwordInvalidElement.setText("");
+                    startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                }
+                else if(response.code() == 500)
+                    emailInvalidElement.setText(INVALID_EMAIL);
+                else if(response.code() == 400)
+                    passwordInvalidElement.setText(INVALID_PASSWORD);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
 
         //TODO: Credentials validation on server
-        if (emailValid && passwordValid) {
-            startActivity(new Intent(this, MapsActivity.class));
-        }
+//        if (emailValid && passwordValid) {
+//            startActivity(new Intent(this, MapsActivity.class));
+//        }
     }
 
     public boolean validateEmail(String email) {
         return !email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    public boolean validatePassword(String password) {
-        //TODO: Change validation based on database constraints
-        return !password.isEmpty();
-    }
+//    public boolean validatePassword(String password) {
+//        //TODO: Change validation based on database constraints
+//        System.out.println(isOK[0]);
+//        return !password.isEmpty() && isOK[0];
+//    }
 
 }
