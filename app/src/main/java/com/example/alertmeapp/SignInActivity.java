@@ -65,6 +65,12 @@ public class SignInActivity extends AppCompatActivity {
         str.setSpan(clickableSpan, INT_START, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         singUpInfo.setText(str);
         singUpInfo.setMovementMethod(LinkMovementMethod.getInstance());
+        singUpInfo.setOnClickListener(v -> changeToSignUpActivity());
+    }
+
+    private void changeToSignUpActivity() {
+        Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
+        startActivity(intent);
     }
 
     public void onSignInClick(View view) {
