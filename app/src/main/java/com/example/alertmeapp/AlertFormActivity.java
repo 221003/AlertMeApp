@@ -16,16 +16,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 public class AlertFormActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST_CODE = 100;
@@ -39,8 +35,11 @@ public class AlertFormActivity extends AppCompatActivity {
             Manifest.permission.CAMERA
     };
 
-    private ImageView uploadedPhoto;
-    private TextView photoUploadInfo;
+    private TextView titleView;
+    private TextView descriptionView;
+    private Spinner categorySpinner;
+    private ImageView uploadedPhotoView;
+    private TextView photoUploadInfoView;
 
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -54,14 +53,18 @@ public class AlertFormActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_form);
-        uploadedPhoto = findViewById(R.id.uploaded_photo);
-        uploadedPhoto.setVisibility(View.INVISIBLE);
-        photoUploadInfo = findViewById(R.id.alert_image_info);
         populateCategorySpinner();
+
+        titleView = findViewById(R.id.alert_form_title);
+        descriptionView = findViewById(R.id.alert_form_description);
+        uploadedPhotoView = findViewById(R.id.uploaded_photo);
+        photoUploadInfoView = findViewById(R.id.alert_image_info);
+
+        uploadedPhotoView.setVisibility(View.INVISIBLE);
     }
 
     private void populateCategorySpinner() {
-        Spinner categorySpinner = findViewById(R.id.alert_form_category);
+        categorySpinner = findViewById(R.id.alert_form_category);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, getCategoriesFromServer());
         categorySpinner.setAdapter(adapter);
     }
@@ -72,6 +75,11 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     public void onFormUploadClick(View view) {
+        String title = titleView.getText().toString();
+        String description = descriptionView.getText().toString();
+        String category = categorySpinner.getSelectedItem().toString();
+
+        //TODO: come up with a way of uploading photo
         //TODO: upload form to the server
     }
 
@@ -98,7 +106,7 @@ public class AlertFormActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-            uploadedPhoto.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            uploadedPhotoView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
         }
     }
 
@@ -131,7 +139,7 @@ public class AlertFormActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-            uploadedPhoto.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            uploadedPhotoView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
             showUploadedPhoto();
         }
     }
@@ -141,14 +149,14 @@ public class AlertFormActivity extends AppCompatActivity {
             Intent data = result.getData();
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            uploadedPhoto.setImageBitmap(imageBitmap);
+            uploadedPhotoView.setImageBitmap(imageBitmap);
             showUploadedPhoto();
         }
     }
 
     private void showUploadedPhoto() {
-        photoUploadInfo.setVisibility(View.INVISIBLE);
-        uploadedPhoto.setVisibility(View.VISIBLE);
+        photoUploadInfoView.setVisibility(View.INVISIBLE);
+        uploadedPhotoView.setVisibility(View.VISIBLE);
     }
 
     @Override
