@@ -26,17 +26,22 @@ import retrofit2.Response;
 
 public class SignInActivity extends AppCompatActivity {
     private final String INVALID_EMAIL = "Email invalid";
-    //TODO: provide useful error message for invalid password
-    private final String INVALID_PASSWORD = "Password invalid";
+    private final String INVALID_PASSWORD = "Password cannot be empty";
     private final String SIGN_UP_INFO =  "Or sign up here";
     private final int INT_START = 11;
     private final int INT_END = 15;
-    private Object TextPaint;
+    private final AlertMeService service = RestAdapter.getAPIClient();
+
+    private TextView emailInvalidElement;
+    private TextView passwordInvalidElement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        emailInvalidElement = findViewById(R.id.emailInvalid);
+        passwordInvalidElement = findViewById(R.id.passwordInvalid);
         signUpInfoInit();
     }
 
@@ -69,14 +74,11 @@ public class SignInActivity extends AppCompatActivity {
 
     public void onSignInClick(View view) {
         EditText emailElement = findViewById(R.id.sign_in_email);
-        String email = emailElement.getText().toString();
         EditText passwordElement = findViewById(R.id.sign_in_password);
+        String email = emailElement.getText().toString();
         String password = passwordElement.getText().toString();
-
         boolean emailValid = validateEmail(email);
-      //  boolean passwordValid = validatePassword(password);
-        TextView emailInvalidElement = findViewById(R.id.emailInvalid);
-        TextView passwordInvalidElement = findViewById(R.id.passwordInvalid);
+        boolean passwordValid = validatePassword(password);
 
         if (emailValid) {
             emailInvalidElement.setText("");
@@ -84,13 +86,26 @@ public class SignInActivity extends AppCompatActivity {
             emailInvalidElement.setText(INVALID_EMAIL);
         }
 
-//        if (passwordValid) {
-//            passwordInvalidElement.setText("");
-//        } else {
-//            passwordInvalidElement.setText(INVALID_PASSWORD);
-//        }
+        if (passwordValid) {
+            passwordInvalidElement.setText("");
+        } else {
+            passwordInvalidElement.setText(INVALID_PASSWORD);
+        }
 
-        AlertMeService service = RestAdapter.getAPIClient();
+        if (emailValid && passwordValid) {
+            validateCredentialsOnServer(email, password);
+        }
+    }
+
+    private boolean validateEmail(String email) {
+        return !email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private boolean validatePassword(String password) {
+        return !password.isEmpty();
+    }
+
+    private void validateCredentialsOnServer(String email, String password) {
         Call<ResponseBody> call = service.login(new LoginBody(email, password));
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -111,21 +126,5 @@ public class SignInActivity extends AppCompatActivity {
 
             }
         });
-
-        //TODO: Credentials validation on server
-//        if (emailValid && passwordValid) {
-//            startActivity(new Intent(this, MapsActivity.class));
-//        }
     }
-
-    public boolean validateEmail(String email) {
-        return !email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-//    public boolean validatePassword(String password) {
-//        //TODO: Change validation based on database constraints
-//        System.out.println(isOK[0]);
-//        return !password.isEmpty() && isOK[0];
-//    }
-
 }
