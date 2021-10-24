@@ -9,7 +9,7 @@
     <string name="sign_up">Sign up</string>
     <string name="first_name">First name</string>
     <string name="i_have_account">I have account</string>
-    <string name="repeat_password">Repeat password</string>
+    <string name="repeat_password">Repeated password</string>
     <string name="password">Password</string>
     <string name="last_name">Last name</string>
 </resources>

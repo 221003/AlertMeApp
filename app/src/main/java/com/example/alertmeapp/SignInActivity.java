@@ -96,8 +96,8 @@ public class SignInActivity extends AppCompatActivity {
 //            passwordInvalidElement.setText(INVALID_PASSWORD);
 //        }
 
-        AlertMeService service = RestAdapter.getAPIClient();
-        Call<ResponseBody> call = service.login(new LoginBody(email, password));
+        AlertMeService service = RestAdapter.getAlertMeService();
+        Call<ResponseBody> call = service.signIn(new LoginBody(email, password));
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
