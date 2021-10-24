@@ -35,7 +35,7 @@
         app:layout_constraintTop_toBottomOf="@+id/alert_form_logo" />
 
     <EditText
-        android:id="@+id/alert_form_title2"
+        android:id="@+id/alert_form_description"
         android:layout_width="308dp"
         android:layout_height="84dp"
         android:layout_marginTop="32dp"
@@ -61,7 +61,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alert_form_title2">
+        app:layout_constraintTop_toBottomOf="@+id/alert_form_description">
 
         <Spinner
             android:id="@+id/alert_form_category"
@@ -86,9 +86,9 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/photo_upload_constraint"
         android:layout_width="308dp"
-        android:layout_height="154dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
@@ -96,62 +96,63 @@
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/alert_image_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
             android:text="@string/alert_form_picture_info"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/choosePhotoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:onClick="onChoosePhotoClick"
-            android:text="@string/alert_form_choose_photo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/takePhotoButton"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/takePhotoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:onClick="onTakePhotoClick"
-            android:text="@string/alert_form_take_photo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/choose_photo_button"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:drawableLeft="@android:drawable/ic_menu_upload"
+            android:onClick="onChoosePhotoClick"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/take_photo_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/take_photo_btn"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:drawableLeft="@android:drawable/ic_menu_camera"
+            android:onClick="onTakePhotoClick"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.684"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
-            android:id="@+id/takenPhotoImage"
+            android:id="@+id/uploaded_photo"
             android:layout_width="92dp"
             android:layout_height="64dp"
-            android:layout_marginTop="88dp"
+
             android:src="@mipmap/ic_launcher_round"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/take_photo_btn"
+            app:layout_constraintHorizontal_bias="0.217"
+            app:layout_constraintStart_toStartOf="@+id/photo_upload_constraint"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
-        android:id="@+id/uploadForm"
+        android:id="@+id/upload_form"
         android:layout_width="308dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:onClick="onTakePhotoClick"
+        android:onClick="onFormUploadClick"
         android:text="@string/alert_form_upload_form"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/photo_upload_constraint" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -38,7 +39,8 @@ public class AlertFormActivity extends AppCompatActivity {
             Manifest.permission.CAMERA
     };
 
-    private ImageView takenPhoto;
+    private ImageView uploadedPhoto;
+    private TextView photoUploadInfo;
 
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -52,7 +54,9 @@ public class AlertFormActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_form);
-        takenPhoto = findViewById(R.id.takenPhotoImage);
+        uploadedPhoto = findViewById(R.id.uploaded_photo);
+        uploadedPhoto.setVisibility(View.INVISIBLE);
+        photoUploadInfo = findViewById(R.id.alert_image_info);
         populateCategorySpinner();
     }
 
@@ -66,6 +70,11 @@ public class AlertFormActivity extends AppCompatActivity {
         //TODO: replace with request to server
         return new String[]{"information", "warning", "other"};
     }
+
+    public void onFormUploadClick(View view) {
+        //TODO: upload form to the server
+    }
+
     public void onChoosePhotoClick(View view) {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
@@ -89,7 +98,7 @@ public class AlertFormActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-            takenPhoto.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            uploadedPhoto.setImageBitmap(BitmapFactory.decodeFile(picturePath));
         }
     }
 
@@ -122,7 +131,8 @@ public class AlertFormActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-            takenPhoto.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            uploadedPhoto.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            showUploadedPhoto();
         }
     }
 
@@ -131,8 +141,14 @@ public class AlertFormActivity extends AppCompatActivity {
             Intent data = result.getData();
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            takenPhoto.setImageBitmap(imageBitmap);
+            uploadedPhoto.setImageBitmap(imageBitmap);
+            showUploadedPhoto();
         }
+    }
+
+    private void showUploadedPhoto() {
+        photoUploadInfo.setVisibility(View.INVISIBLE);
+        uploadedPhoto.setVisibility(View.VISIBLE);
     }
 
     @Override
