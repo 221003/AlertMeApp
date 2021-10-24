@@ -6,4 +6,6 @@
     <string name="password_hint">Password</string>
     <string name="sing_in_button_text">Sign in</string>
     <string name="alertme_logo">AlertMe logo</string>
+    <string name="alert_form_title">Title</string>
+    <string name="alert_form_description">Description</string>
 </resources>
