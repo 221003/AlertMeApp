@@ -161,22 +161,4 @@ public class AlertFormActivity extends AppCompatActivity {
         photoUploadInfoView.setVisibility(View.INVISIBLE);
         uploadedPhotoView.setVisibility(View.VISIBLE);
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //TODO: Camera permission granted
-            } else {
-                //TODO: Camera permission denied
-            }
-        } else if (requestCode == REQUEST_EXTERNAL_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //TODO: External storage permission granted
-            } else {
-                //TODO: External storage permission denied
-            }
-        }
-    }
 }
