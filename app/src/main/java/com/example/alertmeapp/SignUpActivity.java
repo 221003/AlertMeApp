@@ -11,11 +11,19 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.alertmeapp.api.AlertMeService;
+import com.example.alertmeapp.api.RestAdapter;
+import com.example.alertmeapp.api.SignUpBody;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SignUpActivity extends AppCompatActivity {
@@ -40,14 +48,37 @@ public class SignUpActivity extends AppCompatActivity {
         tilPassword = findViewById(R.id.til_password);
         tilRepeatedPassword = findViewById(R.id.til_repeated_password);
         tilSummaryErrors = findViewById(R.id.til_summary_errors);
+        textHaveAcc.setOnClickListener(v -> changeActivityTo(SignInActivity.class));
 
         signUp.setOnClickListener(v->{
-            //TODO if handleInputErrors status ok -> make request to server (sign up user)
             //TODO handle returned JSON message from server -> display message
-            handleInputErrors();
+            if(handleInputErrors()){
+                AlertMeService service = RestAdapter.getAlertMeService();
+                SignUpBody signUpBody = createSignUpBody();
+                Call<ResponseBody> call = service.signUp(signUpBody);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if(response.isSuccessful()){
+                            changeActivityTo(MapsActivity.class);
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    }
+                });
+            }
         });
-        textHaveAcc.setOnClickListener(v -> changeToSignInActivity());
     }
+
+    private SignUpBody createSignUpBody() {
+        String email = tilEmail.getEditText().getText().toString();
+        String firstName = tilFirstName.getEditText().getText().toString();
+        String lastName = tilLastName.getEditText().getText().toString();
+        String password = tilPassword.getEditText().getText().toString();
+        return new SignUpBody(email, firstName, lastName, "", password);
+    }
+
 
     private void cleanErrors() {
         tilEmail.setErrorEnabled(false);
@@ -120,8 +151,8 @@ public class SignUpActivity extends AppCompatActivity {
         return errorMessages.isEmpty();
     }
 
-    private void changeToSignInActivity() {
-        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+    private void changeActivityTo(Class<?> activity) {
+        Intent intent = new Intent(getApplicationContext(), activity);
         startActivity(intent);
     }
 }
