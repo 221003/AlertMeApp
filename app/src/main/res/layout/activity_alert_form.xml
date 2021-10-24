@@ -34,6 +34,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/alert_form_logo" />
 
+    <TextView
+        android:id="@+id/alert_form_title_invalid"
+        android:layout_width="308dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/alert_form_title" />
+
     <EditText
         android:id="@+id/alert_form_description"
         android:layout_width="308dp"
@@ -49,6 +58,15 @@
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/alert_form_title" />
+
+    <TextView
+        android:id="@+id/alert_form_description_invalid"
+        android:layout_width="308dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/alert_form_description" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
@@ -154,5 +172,4 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/photo_upload_constraint" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,9 +36,13 @@ public class AlertFormActivity extends AppCompatActivity {
     private static String[] PERMISSIONS_CAMERA = {
             Manifest.permission.CAMERA
     };
+    private final String INVALID_TITLE = "Title cannot be empty";
+    private final String INVALID_DESCRIPTION = "Description cannot be empty";
 
-    private TextView titleView;
-    private TextView descriptionView;
+    private EditText titleView;
+    private TextView titleInvalidView;
+    private EditText descriptionView;
+    private TextView descriptionInvalidView;
     private Spinner categorySpinner;
     private ImageView uploadedPhotoView;
     private TextView photoUploadInfoView;
@@ -58,7 +63,9 @@ public class AlertFormActivity extends AppCompatActivity {
         populateCategorySpinner();
 
         titleView = findViewById(R.id.alert_form_title);
+        titleInvalidView = findViewById(R.id.alert_form_title_invalid);
         descriptionView = findViewById(R.id.alert_form_description);
+        descriptionInvalidView = findViewById(R.id.alert_form_description_invalid);
         uploadedPhotoView = findViewById(R.id.uploaded_photo);
         photoUploadInfoView = findViewById(R.id.alert_image_info);
         photoUploadLayout = findViewById(R.id.photo_upload_constraint);
@@ -86,9 +93,25 @@ public class AlertFormActivity extends AppCompatActivity {
         String title = titleView.getText().toString();
         String description = descriptionView.getText().toString();
         String category = categorySpinner.getSelectedItem().toString();
+        boolean titleValid = validateTitle(title);
+        boolean descriptionValid = validateDescription(description);
 
-        //TODO: come up with a way of uploading photo
-        //TODO: upload form to the server
+        if (!titleValid) {
+            titleInvalidView.setText(INVALID_TITLE);
+        } else {
+            titleInvalidView.setText("");
+        }
+
+        if (!descriptionValid) {
+            descriptionInvalidView.setText(INVALID_DESCRIPTION);
+        } else {
+            descriptionInvalidView.setText("");
+        }
+
+        if (titleValid && descriptionValid) {
+            //TODO: come up with a way of uploading photo
+            //TODO: upload form to the server
+        }
     }
 
     public void onChoosePhotoClick(View view) {
@@ -160,5 +183,13 @@ public class AlertFormActivity extends AppCompatActivity {
     private void showUploadedPhoto() {
         photoUploadInfoView.setVisibility(View.INVISIBLE);
         uploadedPhotoView.setVisibility(View.VISIBLE);
+    }
+
+    private boolean validateTitle(String title) {
+        return !title.isEmpty();
+    }
+
+    private boolean validateDescription(String description) {
+        return !description.isEmpty();
     }
 }
