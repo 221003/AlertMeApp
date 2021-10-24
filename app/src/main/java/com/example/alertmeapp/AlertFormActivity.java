@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class AlertFormActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST_CODE = 100;
@@ -40,6 +41,7 @@ public class AlertFormActivity extends AppCompatActivity {
     private Spinner categorySpinner;
     private ImageView uploadedPhotoView;
     private TextView photoUploadInfoView;
+    private ConstraintLayout photoUploadLayout;
 
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -59,8 +61,14 @@ public class AlertFormActivity extends AppCompatActivity {
         descriptionView = findViewById(R.id.alert_form_description);
         uploadedPhotoView = findViewById(R.id.uploaded_photo);
         photoUploadInfoView = findViewById(R.id.alert_image_info);
+        photoUploadLayout = findViewById(R.id.photo_upload_constraint);
 
-        uploadedPhotoView.setVisibility(View.INVISIBLE);
+        //Hide photo upload section if camera is not available
+        if (!checkCameraHardware(getApplicationContext())) {
+            photoUploadLayout.setVisibility(View.INVISIBLE);
+        } else {
+            uploadedPhotoView.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void populateCategorySpinner() {
@@ -111,11 +119,6 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     public void onTakePhotoClick(View view) {
-        if (!checkCameraHardware(view.getContext())) {
-            //TODO: inform that system has no camera
-            return;
-        }
-
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_CAMERA, CAMERA_REQUEST_CODE);
         }
