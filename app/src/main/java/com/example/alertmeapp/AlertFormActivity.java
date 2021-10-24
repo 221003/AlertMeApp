@@ -12,7 +12,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -51,8 +53,19 @@ public class AlertFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_form);
         takenPhoto = findViewById(R.id.takenPhotoImage);
+        populateCategorySpinner();
     }
 
+    private void populateCategorySpinner() {
+        Spinner categorySpinner = findViewById(R.id.alert_form_category);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, getCategoriesFromServer());
+        categorySpinner.setAdapter(adapter);
+    }
+
+    private String[] getCategoriesFromServer() {
+        //TODO: replace with request to server
+        return new String[]{"information", "warning", "other"};
+    }
     public void onChoosePhotoClick(View view) {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
