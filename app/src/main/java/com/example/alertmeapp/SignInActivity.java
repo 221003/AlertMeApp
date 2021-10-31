@@ -74,12 +74,11 @@ public class SignInActivity extends AppCompatActivity {
         str.setSpan(clickableSpan, INT_START, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         singUpInfo.setText(str);
         singUpInfo.setMovementMethod(LinkMovementMethod.getInstance());
-        singUpInfo.setOnClickListener(v -> changeToSignUpActivity());
+        singUpInfo.setOnClickListener(v -> changeActivityTo(SignUpActivity.class));
     }
 
-    private void changeToSignUpActivity() {
-        Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-        startActivity(intent);
+    private void changeActivityTo(Class<?> activity) {
+        startActivity(new Intent(getApplicationContext(), activity));
     }
 
     private void displayToast() {
@@ -117,7 +116,7 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful())
-                    startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                    changeActivityTo(MainActivity.class);
                 else {
                     try {
                         String json = response.errorBody().string();
