@@ -25,6 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SignInActivity extends AppCompatActivity {
+
     private final String INVALID_EMAIL = "Email invalid";
     private final String INVALID_PASSWORD = "Password cannot be empty";
     private final String SIGN_UP_INFO =  "Or sign up here";
