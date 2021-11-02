@@ -8,7 +8,14 @@
          location permissions for the "MyLocation" functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <uses-feature android:name="android.hardware.camera" />
+
 
     <application
         android:allowBackup="true"
@@ -16,22 +23,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AlertMeApp"
-        android:usesCleartextTraffic="true">
 
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
+        android:theme="@style/Theme.AlertMeApp">
+        android:usesCleartextTraffic="true">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".SignInActivity">
+        <activity android:name=".AlertFormActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,6 +39,7 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".SignUpActivity" />
+        <activity android:name=".SignInActivity" />
     </application>
 
 </manifest>

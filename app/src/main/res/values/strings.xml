@@ -6,6 +6,13 @@
     <string name="password_hint">Password</string>
     <string name="sing_in_button_text">Sign in</string>
     <string name="alertme_logo">AlertMe logo</string>
+    <string name="alert_form_title">Title</string>
+    <string name="alert_form_description">Description</string>
+    <string name="alert_form_picture_info">Alert image-</string>
+    <string name="alert_form_choose_photo">Choose photo</string>
+    <string name="alert_form_take_photo">Take photo</string>
+    <string name="alert_form_upload_form">Add notification</string>
+    <string name="enter_localization">Choose localization</string>
     <string name="sign_up">Sign up</string>
     <string name="first_name">First name</string>
     <string name="i_have_account">I have account</string>

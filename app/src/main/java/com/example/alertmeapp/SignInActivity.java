@@ -31,6 +31,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SignInActivity extends AppCompatActivity {
+
     private final String INVALID_EMAIL = "Email invalid";
     //TODO: provide useful error message for invalid password
     private final String EMPTY_PASSWORD = "Empty password field";
@@ -40,12 +41,18 @@ public class SignInActivity extends AppCompatActivity {
     private final int INT_END = 15;
     private final int INCORRECT_PASSWORD_CODE = 10;
     private final int INCORRECT_LOGIN_CODE = 11;
+    private final AlertMeService service = RestAdapter.getAPIClient();
+    private TextView emailInvalidElement;
+    private TextView passwordInvalidElement;
     private Object TextPaint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        emailInvalidElement = findViewById(R.id.emailInvalid);
+        passwordInvalidElement = findViewById(R.id.passwordInvalid);
         signUpInfoInit();
     }
 
@@ -88,14 +95,16 @@ public class SignInActivity extends AppCompatActivity {
 
     public void onSignInClick(View view) {
         EditText emailElement = findViewById(R.id.sign_in_email);
-        String email = emailElement.getText().toString();
         EditText passwordElement = findViewById(R.id.sign_in_password);
+        String email = emailElement.getText().toString();
         String password = passwordElement.getText().toString();
         boolean emailValid = validateEmail(email);
-        TextView emailInvalidElement = findViewById(R.id.emailInvalid);
-        TextView passwordInvalidElement = findViewById(R.id.passwordInvalid);
+        boolean passwordValid = validatePassword(password);
+        emailInvalidElement = findViewById(R.id.emailInvalid);
+        passwordInvalidElement = findViewById(R.id.passwordInvalid);
         emailInvalidElement.setText("");
         passwordInvalidElement.setText("");
+
 
         if (email.isEmpty())
             emailInvalidElement.setText(EMPTY_EMAIL);
@@ -106,6 +115,10 @@ public class SignInActivity extends AppCompatActivity {
 
         if (emailValid && !email.isEmpty() && !password.isEmpty())
             requestToSignInUser(email, password, emailInvalidElement, passwordInvalidElement);
+    }
+
+    private boolean validateEmail(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private void requestToSignInUser(String email, String password,
@@ -146,6 +159,4 @@ public class SignInActivity extends AppCompatActivity {
     private boolean validateEmail(String email) {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
-
-
 }
