@@ -41,7 +41,7 @@ public class SignInActivity extends AppCompatActivity {
     private final int INT_END = 15;
     private final int INCORRECT_PASSWORD_CODE = 10;
     private final int INCORRECT_LOGIN_CODE = 11;
-    private final AlertMeService service = RestAdapter.getAPIClient();
+    private AlertMeService service = RestAdapter.getAlertMeService();
     private TextView emailInvalidElement;
     private TextView passwordInvalidElement;
     private Object TextPaint;
@@ -99,7 +99,6 @@ public class SignInActivity extends AppCompatActivity {
         String email = emailElement.getText().toString();
         String password = passwordElement.getText().toString();
         boolean emailValid = validateEmail(email);
-        boolean passwordValid = validatePassword(password);
         emailInvalidElement = findViewById(R.id.emailInvalid);
         passwordInvalidElement = findViewById(R.id.passwordInvalid);
         emailInvalidElement.setText("");
@@ -117,13 +116,10 @@ public class SignInActivity extends AppCompatActivity {
             requestToSignInUser(email, password, emailInvalidElement, passwordInvalidElement);
     }
 
-    private boolean validateEmail(String email) {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
 
     private void requestToSignInUser(String email, String password,
                                      TextView emailInvalidElement, TextView passwordInvalidElement) {
-        AlertMeService service = RestAdapter.getAlertMeService();
+        service = RestAdapter.getAlertMeService();
         Call<ResponseBody> call = service.signIn(new LoginBody(email, password));
         call.enqueue(new Callback<ResponseBody>() {
             @Override
