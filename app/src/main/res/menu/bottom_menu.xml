@@ -12,6 +12,11 @@
         android:icon="@drawable/ic_view_list"
         />
     <item
+        android:id="@+id/alertFormFragment"
+        android:title="Add alert"
+        android:icon="@drawable/ic_add_alert"
+        />
+    <item
         android:id="@+id/settingsFragment"
         android:title="Settings"
         android:icon="@drawable/ic_settings"

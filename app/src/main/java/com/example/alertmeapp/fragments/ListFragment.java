@@ -1,4 +1,4 @@
-package com.example.alertmeapp;
+package com.example.alertmeapp.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.alertmeapp.R;
 import com.example.alertmeapp.dummy.DummyContent;
+import com.example.alertmeapp.dummy.MyListRecyclerViewAdapter;
 
 /**
  * A fragment representing a list of Items.

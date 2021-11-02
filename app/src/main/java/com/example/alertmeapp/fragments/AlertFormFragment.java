@@ -1,5 +1,6 @@
-package com.example.alertmeapp;
+package com.example.alertmeapp.fragments;
 
+import static android.app.Activity.RESULT_OK;
 import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
 
 import android.Manifest;
@@ -11,38 +12,35 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.LocaleList;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.example.alertmeapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.util.Locale;
-
-public class AlertFormActivity extends AppCompatActivity {
+public class AlertFormFragment extends Fragment {
     private static final int CAMERA_REQUEST_CODE = 100;
     private static final int GALLERY_REQUEST_CODE = 101;
     private static final int REQUEST_EXTERNAL_STORAGE = 102;
@@ -80,33 +78,49 @@ public class AlertFormActivity extends AppCompatActivity {
 
     private Location lastLocation;
 
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alert_form);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_alert_form, container, false);
+
+        Button buttonPhoto = view.findViewById(R.id.take_photo_btn);
+        Button buttonUploader = view.findViewById(R.id.upload_form);
+        Button buttonPhotoChooser = view.findViewById(R.id.choose_photo_button);
+        Button buttonLocalization = view.findViewById(R.id.enter_localization);
+
+        buttonPhoto.setOnClickListener(this::onTakePhotoClick);
+        buttonUploader.setOnClickListener(this::onFormUploadClick);
+        buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
+        buttonLocalization.setOnClickListener(this::onChooseLocalization);
 
         getLastLocation();
+        categorySpinner = view.findViewById(R.id.alert_form_category);
         populateCategorySpinner();
 
-        titleView = findViewById(R.id.alert_form_title);
-        titleInvalidView = findViewById(R.id.alert_form_title_invalid);
-        descriptionView = findViewById(R.id.alert_form_description);
-        descriptionInvalidView = findViewById(R.id.alert_form_description_invalid);
-        uploadedPhotoView = findViewById(R.id.uploaded_photo);
-        photoUploadInfoView = findViewById(R.id.alert_image_info);
-        photoUploadLayout = findViewById(R.id.photo_upload_constraint);
+        titleView = view.findViewById(R.id.alert_form_title);
+        titleInvalidView = view.findViewById(R.id.alert_form_title_invalid);
+        descriptionView = view.findViewById(R.id.alert_form_description);
+        descriptionInvalidView = view.findViewById(R.id.alert_form_description_invalid);
+        uploadedPhotoView = view.findViewById(R.id.uploaded_photo);
+        photoUploadInfoView = view.findViewById(R.id.alert_image_info);
+        photoUploadLayout = view.findViewById(R.id.photo_upload_constraint);
 
         //Hide photo upload section if camera is not available
-        if (!checkCameraHardware(getApplicationContext())) {
+        if (!checkCameraHardware(getActivity())) {
             photoUploadLayout.setVisibility(View.INVISIBLE);
         } else {
             uploadedPhotoView.setVisibility(View.INVISIBLE);
         }
+        return view;
     }
 
     private void populateCategorySpinner() {
-        categorySpinner = findViewById(R.id.alert_form_category);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, getCategoriesFromServer());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, getCategoriesFromServer());
         categorySpinner.setAdapter(adapter);
     }
 
@@ -141,7 +155,7 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     public void onChoosePhotoClick(View view) {
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
         }
 
@@ -152,12 +166,12 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage,
+            Cursor cursor = getActivity().getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
             cursor.moveToFirst();
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
@@ -168,7 +182,7 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     public void onTakePhotoClick(View view) {
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_CAMERA, CAMERA_REQUEST_CODE);
         }
 
@@ -181,11 +195,11 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     private void processChosenPhoto(ActivityResult result) {
-        if (result.getResultCode() == Activity.RESULT_OK) {
+        if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             Uri selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage,
+            Cursor cursor = getActivity().getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
             cursor.moveToFirst();
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
@@ -197,7 +211,7 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     private void processTakenPhoto(ActivityResult result) {
-        if (result.getResultCode() == Activity.RESULT_OK) {
+        if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -220,12 +234,12 @@ public class AlertFormActivity extends AppCompatActivity {
     }
 
     public void getLastLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
         }
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {

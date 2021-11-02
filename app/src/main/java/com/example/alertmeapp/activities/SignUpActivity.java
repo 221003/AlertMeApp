@@ -1,4 +1,4 @@
-package com.example.alertmeapp;
+package com.example.alertmeapp.activities;
 
 
 import android.content.Intent;
@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.alertmeapp.R;
+import com.example.alertmeapp.activities.MainActivity;
+import com.example.alertmeapp.activities.SignInActivity;
 import com.example.alertmeapp.api.AlertMeService;
 import com.example.alertmeapp.api.RestAdapter;
 import com.example.alertmeapp.api.SignUpBody;

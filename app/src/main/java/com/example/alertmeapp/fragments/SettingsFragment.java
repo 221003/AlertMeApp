@@ -1,8 +1,10 @@
-package com.example.alertmeapp;
+package com.example.alertmeapp.fragments;
 
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.example.alertmeapp.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
