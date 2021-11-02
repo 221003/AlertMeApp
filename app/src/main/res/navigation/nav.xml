@@ -6,16 +6,19 @@
     app:startDestination="@id/mapsFragment">
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.example.alertmeapp.MapsFragment"
+        android:name="com.example.alertmeapp.fragments.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
     <fragment
         android:id="@+id/listFragment"
-        android:name="com.example.alertmeapp.ListFragment"
+        android:name="com.example.alertmeapp.fragments.ListFragment"
         android:label="fragment_item_list"
         tools:layout="@layout/fragment_item_list" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.alertmeapp.SettingsFragment"
+        android:name="com.example.alertmeapp.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/alertFormFragment"
+        android:name="com.example.alertmeapp.fragments.AlertFormFragment" />
 </navigation>

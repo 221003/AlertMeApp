@@ -1,4 +1,4 @@
-package com.example.alertmeapp;
+package com.example.alertmeapp.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.AlertMeService;
 import com.example.alertmeapp.api.LoginBody;
 import com.example.alertmeapp.api.RestAdapter;
