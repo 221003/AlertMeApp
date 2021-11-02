@@ -59,9 +59,8 @@ public class SignUpActivity extends AppCompatActivity {
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if(response.isSuccessful()){
-                            changeActivityTo(MapsActivity.class);
-                        }
+                        if(response.isSuccessful())
+                            changeActivityTo(MainActivity.class);
                     }
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
