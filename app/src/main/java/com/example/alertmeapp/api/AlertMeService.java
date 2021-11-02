@@ -7,5 +7,8 @@ import retrofit2.http.POST;
 
 public interface AlertMeService {
     @POST("api/users/login")
-    Call<ResponseBody> login(@Body LoginBody loginBody);
+    Call<ResponseBody> signIn(@Body LoginBody loginBody);
+
+    @POST("api/users")
+    Call<ResponseBody> signUp(@Body SignUpBody signUpBody);
 }
