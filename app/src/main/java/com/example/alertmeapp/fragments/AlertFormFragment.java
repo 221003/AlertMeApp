@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,10 +33,27 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.alertmeapp.R;
+import com.example.alertmeapp.activities.MainActivity;
 import com.example.alertmeapp.activities.MapsActivity;
+import com.example.alertmeapp.activities.SignInActivity;
+import com.example.alertmeapp.api.AlertMeService;
+import com.example.alertmeapp.api.AlertType;
+import com.example.alertmeapp.api.AlertTypeResponse;
+import com.example.alertmeapp.api.RestAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AlertFormFragment extends Fragment {
     private static final int CAMERA_REQUEST_CODE = 100;
@@ -79,6 +97,7 @@ public class AlertFormFragment extends Fragment {
     private Double longitude;
     private Double latitude;
 
+    private final AlertMeService service = RestAdapter.getAlertMeService();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -133,13 +152,37 @@ public class AlertFormFragment extends Fragment {
     }
 
     private void populateCategorySpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, getCategoriesFromServer());
-        categorySpinner.setAdapter(adapter);
-    }
+        List<String> categories = new ArrayList<>(5);
 
-    private String[] getCategoriesFromServer() {
-        //TODO: replace with request to server
-        return new String[]{"information", "warning", "other"};
+        Call<AlertTypeResponse> allAlertTypes = service.getAllAlertTypes();
+        allAlertTypes.enqueue(new Callback<AlertTypeResponse>() {
+            @Override
+            public void onResponse(Call<AlertTypeResponse> call, Response<AlertTypeResponse> response) {
+                for (AlertType alertType : response.body().getAllAlertTypes()) {
+                    categories.add(alertType.getName());
+                    System.out.println("nazwa: " + categories.get(0));
+                }
+                ArrayAdapter<String> adapter = null;
+                try {
+                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                categorySpinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<AlertTypeResponse> call, Throwable t) {
+                displayToast();
+                ArrayAdapter<String> adapter = null;
+                try {
+                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, new String[0]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                categorySpinner.setAdapter(adapter);
+            }
+        });
     }
 
     public void onFormUploadClick(View view) {
@@ -263,7 +306,7 @@ public class AlertFormFragment extends Fragment {
                                 if (location != null) {
                                     lastLocation = location;
                                 } else {
-                                    lastLocation=new Location("");
+                                    lastLocation = new Location("");
                                     lastLocation.setLatitude(52.237049);
                                     lastLocation.setLongitude(21.017532);
                                 }
@@ -277,5 +320,10 @@ public class AlertFormFragment extends Fragment {
         i.putExtra("longitude", lastLocation.getLongitude());
         i.putExtra("latitude", lastLocation.getLatitude());
         startActivity(i);
+    }
+
+    private void displayToast() {
+        Toast.makeText(getContext(), "Error occurred",
+                Toast.LENGTH_LONG).show();
     }
 }
