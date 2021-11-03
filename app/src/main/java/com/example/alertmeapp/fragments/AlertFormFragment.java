@@ -1,10 +1,8 @@
 package com.example.alertmeapp.fragments;
 
 import static android.app.Activity.RESULT_OK;
-import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,16 +26,15 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.alertmeapp.R;
+import com.example.alertmeapp.activities.MapsActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 public class AlertFormFragment extends Fragment {
@@ -58,6 +55,7 @@ public class AlertFormFragment extends Fragment {
     };
     private final String INVALID_TITLE = "Title cannot be empty";
     private final String INVALID_DESCRIPTION = "Description cannot be empty";
+    private final String INVALID_LOCALIZATION = "Please enter the localization";
 
     private EditText titleView;
     private TextView titleInvalidView;
@@ -67,6 +65,7 @@ public class AlertFormFragment extends Fragment {
     private ImageView uploadedPhotoView;
     private TextView photoUploadInfoView;
     private ConstraintLayout photoUploadLayout;
+    private TextView localizationInvalid;
 
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -77,11 +76,9 @@ public class AlertFormFragment extends Fragment {
             result -> processChosenPhoto(result));
 
     private Location lastLocation;
+    private Double longitude;
+    private Double latitude;
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,6 +106,7 @@ public class AlertFormFragment extends Fragment {
         uploadedPhotoView = view.findViewById(R.id.uploaded_photo);
         photoUploadInfoView = view.findViewById(R.id.alert_image_info);
         photoUploadLayout = view.findViewById(R.id.photo_upload_constraint);
+        localizationInvalid = view.findViewById(R.id.enter_localization_invalid);
 
         //Hide photo upload section if camera is not available
         if (!checkCameraHardware(getActivity())) {
@@ -117,6 +115,21 @@ public class AlertFormFragment extends Fragment {
             uploadedPhotoView.setVisibility(View.INVISIBLE);
         }
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getAlertCords();
+    }
+
+    private void getAlertCords() {
+        Bundle extras = getActivity().getIntent().getExtras();
+        if (extras != null) {
+            this.longitude = extras.getDouble("longitude");
+            this.latitude = extras.getDouble("latitude");
+        }
+
     }
 
     private void populateCategorySpinner() {
@@ -148,9 +161,14 @@ public class AlertFormFragment extends Fragment {
             descriptionInvalidView.setText("");
         }
 
+        if (longitude == null || latitude == null) {
+            localizationInvalid.setText(INVALID_LOCALIZATION);
+        } else {
+            descriptionInvalidView.setText("");
+        }
+
         if (titleValid && descriptionValid) {
-            //TODO: come up with a way of uploading photo
-            //TODO: upload form to the server
+
         }
     }
 
@@ -255,6 +273,9 @@ public class AlertFormFragment extends Fragment {
     }
 
     public void onChooseLocalization(View view) {
-
+        Intent i = new Intent(getActivity(), MapsActivity.class);
+        i.putExtra("longitude", lastLocation.getLongitude());
+        i.putExtra("latitude", lastLocation.getLatitude());
+        startActivity(i);
     }
 }

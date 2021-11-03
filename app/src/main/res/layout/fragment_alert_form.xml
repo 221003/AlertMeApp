@@ -1,183 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <ImageView
-        android:id="@+id/alert_form_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:contentDescription="@string/alertme_logo"
-        android:minWidth="50dp"
-        android:minHeight="50dp"
-        android:src="@mipmap/ic_launcher_round"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
-
-    <EditText
-        android:id="@+id/alert_form_title"
-        android:layout_width="308dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/input_background"
-        android:ems="10"
-        android:hint="@string/alert_form_title"
-        android:inputType="textMultiLine"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alert_form_logo" />
-
-    <TextView
-        android:id="@+id/alert_form_title_invalid"
-        android:layout_width="308dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/red"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alert_form_title" />
-
-    <EditText
-        android:id="@+id/alert_form_description"
-        android:layout_width="308dp"
-        android:layout_height="84dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/input_background"
-        android:ems="10"
-        android:hint="@string/alert_form_description"
-        android:inputType="textPersonName"
-        android:padding="10dp"
-        android:gravity="top"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alert_form_title" />
-
-    <TextView
-        android:id="@+id/alert_form_description_invalid"
-        android:layout_width="308dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/red"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alert_form_description" />
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="308dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_weight=".28"
-        android:background="@drawable/input_background"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alert_form_description">
-
-        <Spinner
-            android:id="@+id/alert_form_category"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:spinnerMode="dropdown" />
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:src="@mipmap/ic_launcher_round" />
-
-    </RelativeLayout>
-
-    <Button
-        android:id="@+id/enter_localization"
-        android:layout_width="308dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/enter_localization"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:stackFromBottom="true"
+    android:transcriptMode="alwaysScroll">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/photo_upload_constraint"
-        android:layout_width="308dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enter_localization">
-
-        <TextView
-            android:id="@+id/alert_image_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/alert_form_picture_info"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/choose_photo_button"
-            android:layout_width="64dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:drawableLeft="@android:drawable/ic_menu_upload"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/take_photo_btn"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/take_photo_btn"
-            android:layout_width="64dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:drawableLeft="@android:drawable/ic_menu_camera"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.684"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/uploaded_photo"
-            android:layout_width="92dp"
-            android:layout_height="64dp"
-
+            android:id="@+id/alert_form_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/alertme_logo"
+            android:minWidth="50dp"
+            android:minHeight="50dp"
+            android:layout_marginTop="20dp"
             android:src="@mipmap/ic_launcher_round"
-            app:layout_constraintEnd_toStartOf="@+id/take_photo_btn"
-            app:layout_constraintHorizontal_bias="0.217"
-            app:layout_constraintStart_toStartOf="@+id/photo_upload_constraint"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
 
+        <EditText
+            android:id="@+id/alert_form_title"
+            android:layout_width="308dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/input_background"
+            android:ems="10"
+            android:hint="@string/alert_form_title"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alert_form_logo" />
+
+        <TextView
+            android:id="@+id/alert_form_title_invalid"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alert_form_title" />
+
+        <EditText
+            android:id="@+id/alert_form_description"
+            android:layout_width="308dp"
+            android:layout_height="84dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/input_background"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/alert_form_description"
+            android:inputType="textPersonName"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alert_form_title" />
+
+        <TextView
+            android:id="@+id/alert_form_description_invalid"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alert_form_description" />
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_weight=".28"
+            android:background="@drawable/input_background"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alert_form_description">
+
+            <Spinner
+                android:id="@+id/alert_form_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:spinnerMode="dropdown" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher_round" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/enter_localization"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:onClick="onChooseLocalization"
+            android:text="@string/enter_localization"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+        <TextView
+            android:id="@+id/enter_localization_invalid"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/enter_localization" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/photo_upload_constraint"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/enter_localization">
+
+            <TextView
+                android:id="@+id/alert_image_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/alert_form_picture_info"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/choose_photo_button"
+                android:layout_width="64dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:drawableLeft="@android:drawable/ic_menu_upload"
+                android:onClick="onChoosePhotoClick"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/take_photo_btn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/take_photo_btn"
+                android:layout_width="64dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:drawableLeft="@android:drawable/ic_menu_camera"
+                android:onClick="onTakePhotoClick"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.684"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/uploaded_photo"
+                android:layout_width="92dp"
+                android:layout_height="64dp"
+
+                android:src="@mipmap/ic_launcher_round"
+                app:layout_constraintEnd_toStartOf="@+id/take_photo_btn"
+                app:layout_constraintHorizontal_bias="0.217"
+                app:layout_constraintStart_toStartOf="@+id/photo_upload_constraint"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/upload_form"
+            android:layout_width="308dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:onClick="onFormUploadClick"
+            android:text="@string/alert_form_upload_form"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photo_upload_constraint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <Button
-        android:id="@+id/upload_form"
-        android:layout_width="308dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/alert_form_upload_form"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photo_upload_constraint" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
