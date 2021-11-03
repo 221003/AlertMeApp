@@ -10,11 +10,14 @@ import retrofit2.http.POST;
 
 public interface AlertMeService {
     @POST("api/users/login")
-    Call<ResponseBody> signIn(@Body LoginBody loginBody);
+    Call<ServeLogInResponse> signIn(@Body LoginBody loginBody);
 
     @POST("api/users")
     Call<ResponseBody> signUp(@Body SignUpBody signUpBody);
     
     @GET("/api/alert-types")
     Call<AlertTypeResponse> getAllAlertTypes();
+
+    @POST("/api/alerts")
+    Call<ResponseBody> saveNewAlert(@Body AlertBody alertBody);
 }

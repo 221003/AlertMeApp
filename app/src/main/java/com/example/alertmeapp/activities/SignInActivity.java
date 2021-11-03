@@ -20,13 +20,15 @@ import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.AlertMeService;
 import com.example.alertmeapp.api.LoginBody;
 import com.example.alertmeapp.api.RestAdapter;
+import com.example.alertmeapp.api.ServeLogInResponse;
+import com.example.alertmeapp.api.User;
+import com.example.alertmeapp.logedInUser.LoggedInUser;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 
 import java.io.IOException;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -120,13 +122,14 @@ public class SignInActivity extends AppCompatActivity {
 
     private void requestToSignInUser(String email, String password,
                                      TextView emailInvalidElement, TextView passwordInvalidElement) {
-        Call<ResponseBody> call = service.signIn(new LoginBody(email, password));
-        call.enqueue(new Callback<ResponseBody>() {
+        Call<ServeLogInResponse> call = service.signIn(new LoginBody(email, password));
+        call.enqueue(new Callback<ServeLogInResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful())
+            public void onResponse(Call<ServeLogInResponse> call, Response<ServeLogInResponse> response) {
+                if (response.isSuccessful()) {
+                    LoggedInUser.getInstance(response.body().getUser());
                     changeActivityTo(MainActivity.class);
-                else {
+                } else {
                     try {
                         String json = response.errorBody().string();
                         JsonParser jsonParser = new JsonParser();
@@ -142,14 +145,14 @@ public class SignInActivity extends AppCompatActivity {
                         displayToast();
                     }
                 }
-
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ServeLogInResponse> call, Throwable t) {
                 displayToast();
             }
         });
+
     }
 
     private boolean validateEmail(String email) {

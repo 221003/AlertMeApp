@@ -1,6 +1,8 @@
 package com.example.alertmeapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -51,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(cord));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cord, 10));
         Marker marker = googleMap.addMarker(new MarkerOptions().position(cord).draggable(true));
+        alertLocalization = marker;
 
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
@@ -83,9 +86,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void onClickCords(View view) {
-        Intent i = new Intent(this, AlertFormFragment.class);
-        i.putExtra("longitude", alertLocalization.getPosition().longitude);
-        i.putExtra("latitude", alertLocalization.getPosition().latitude);
-        startActivity(i);
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putFloat("longitude",Float.valueOf(String.valueOf(alertLocalization.getPosition().longitude)));
+        editor.putFloat("latitude",Float.valueOf(String.valueOf(alertLocalization.getPosition().latitude)));
+        editor.apply();
+
+        finish();
     }
 }
