@@ -151,13 +151,6 @@ public class AlertFormFragment extends Fragment {
         this.longitude = Double.valueOf(sharedPref.getFloat("longitude", 51.759f));
         this.latitude = Double.valueOf(sharedPref.getFloat("latitude", 19.457f));
 
-
-        Bundle extras = getActivity().getIntent().getExtras();
-        if (extras != null) {
-            this.longitude = extras.getDouble("longitude");
-            this.latitude = extras.getDouble("latitude");
-        }
-
     }
 
     private void populateCategorySpinner() {
@@ -221,11 +214,12 @@ public class AlertFormFragment extends Fragment {
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
             requestToSaveAlert(new AlertBody(Long.valueOf(LoggedInUser.getInstance(null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-                    , title, description, 0, latitude.intValue(), longitude.intValue(), getCurrentDate()));
+                    , title, description, 0, latitude, longitude, getCurrentDate()));
         }
     }
 
     private void requestToSaveAlert(AlertBody alertBody) {
+        System.out.println(alertBody.toString());
         Call<ResponseBody> responseBodyCall = service.saveNewAlert(alertBody);
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
