@@ -1,4 +1,4 @@
-package com.example.alertmeapp.api;
+package com.example.alertmeapp.api.serverRequest;
 
 public class LoginBody {
     private String login;

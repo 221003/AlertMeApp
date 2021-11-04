@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.dummy.DummyContent;
+import com.example.alertmeapp.dummy.AlertContent;
 import com.example.alertmeapp.dummy.MyListRecyclerViewAdapter;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -57,19 +59,18 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
 
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                System.out.println("halo1");
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-                System.out.println("halo2");
             }
-            recyclerView.setAdapter(new MyListRecyclerViewAdapter(DummyContent.ITEMS));
+            //initialize list with items and sets adapter
+            AlertContent alertContent = new AlertContent(recyclerView);
         }
         return view;
     }
+
 }

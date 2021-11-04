@@ -1,7 +1,11 @@
 package com.example.alertmeapp.activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -15,14 +19,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.LoginBody;
+import com.example.alertmeapp.api.serverRequest.LoginBody;
 import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.api.ServeLogInResponse;
-import com.example.alertmeapp.api.User;
+import com.example.alertmeapp.api.serverResponse.ServeLogInResponse;
 import com.example.alertmeapp.logedInUser.LoggedInUser;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -48,6 +56,15 @@ public class SignInActivity extends AppCompatActivity {
     private TextView emailInvalidElement;
     private TextView passwordInvalidElement;
     private Object TextPaint;
+
+
+    private static String[] PERMISSIONS_LOCALIZATION = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+    private static final int REQUEST_LOCATION_CODE = 103;
+    private String latitude;
+    private String longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +139,13 @@ public class SignInActivity extends AppCompatActivity {
 
     private void requestToSignInUser(String email, String password,
                                      TextView emailInvalidElement, TextView passwordInvalidElement) {
+        getLastLocation();
         Call<ServeLogInResponse> call = service.signIn(new LoginBody(email, password));
         call.enqueue(new Callback<ServeLogInResponse>() {
             @Override
             public void onResponse(Call<ServeLogInResponse> call, Response<ServeLogInResponse> response) {
                 if (response.isSuccessful()) {
-                    LoggedInUser.getInstance(response.body().getUser());
+                    LoggedInUser.getInstance(response.body().getUser(), longitude, latitude);
                     changeActivityTo(MainActivity.class);
                 } else {
                     try {
@@ -153,6 +171,35 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void getLastLocation() {
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener( this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                if (location != null) {
+                                    latitude = String.valueOf(location.getLatitude());
+                                    longitude = String.valueOf(location.getLongitude());
+
+                                } else {
+                                    latitude = "52.237049";
+                                    longitude = "21.017532";
+                                }
+                            }
+                        }
+                ).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                latitude = "52.237049";
+                longitude = "21.017532";
+            }
+        });
     }
 
     private boolean validateEmail(String email) {

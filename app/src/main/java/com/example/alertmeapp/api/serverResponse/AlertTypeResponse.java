@@ -1,5 +1,6 @@
-package com.example.alertmeapp.api;
+package com.example.alertmeapp.api.serverResponse;
 
+import com.example.alertmeapp.api.serverRequest.AlertType;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;

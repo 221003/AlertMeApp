@@ -1,6 +1,6 @@
 package com.example.alertmeapp.logedInUser;
 
-import com.example.alertmeapp.api.User;
+import com.example.alertmeapp.api.serverRequest.User;
 
 public class LoggedInUser {
     private static LoggedInUser loggedUser;
@@ -8,16 +8,20 @@ public class LoggedInUser {
     private Integer id;
     private String fistName;
     private String lastName;
+    private String lastLongitude;
+    private String lastLatitude;
 
-    private LoggedInUser(User user) {
+    private LoggedInUser(User user, String longitude, String latitude) {
         this.id = user.getId();
         this.fistName = user.getFistName();
         this.lastName = user.getLastName();
+        this.lastLongitude = longitude;
+        this.lastLatitude = latitude;
     }
 
-    public static LoggedInUser getInstance(User user) {
+    public static LoggedInUser getInstance(User user, String longitude, String latitude) {
         if (loggedUser == null) {
-            loggedUser = new LoggedInUser(user);
+            loggedUser = new LoggedInUser(user, longitude, latitude);
         }
         return loggedUser;
     }
@@ -33,5 +37,21 @@ public class LoggedInUser {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getLastLongitude() {
+        return lastLongitude;
+    }
+
+    public void setLastLongitude(String lastLongitude) {
+        this.lastLongitude = lastLongitude;
+    }
+
+    public String getLastLatitude() {
+        return lastLatitude;
+    }
+
+    public void setLastLatitude(String lastLatitude) {
+        this.lastLatitude = lastLatitude;
     }
 }

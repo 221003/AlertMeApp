@@ -1,4 +1,4 @@
-package com.example.alertmeapp.api;
+package com.example.alertmeapp.api.serverRequest;
 
 public class AlertType {
     private Integer id;

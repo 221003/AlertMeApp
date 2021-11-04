@@ -1,4 +1,4 @@
-package com.example.alertmeapp.api;
+package com.example.alertmeapp.api.serverRequest;
 
 import com.google.gson.annotations.SerializedName;
 

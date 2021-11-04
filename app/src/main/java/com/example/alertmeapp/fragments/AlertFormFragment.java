@@ -36,10 +36,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.activities.MapsActivity;
-import com.example.alertmeapp.api.AlertBody;
+import com.example.alertmeapp.api.serverRequest.NewAlertBody;
 import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.AlertType;
-import com.example.alertmeapp.api.AlertTypeResponse;
+import com.example.alertmeapp.api.serverRequest.AlertType;
+import com.example.alertmeapp.api.serverResponse.AlertTypeResponse;
 import com.example.alertmeapp.api.RestAdapter;
 import com.example.alertmeapp.logedInUser.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -213,14 +213,14 @@ public class AlertFormFragment extends Fragment {
         }
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
-            requestToSaveAlert(new AlertBody(Long.valueOf(LoggedInUser.getInstance(null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
+            requestToSaveAlert(new NewAlertBody(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
                     , title, description, 0, latitude, longitude, getCurrentDate()));
         }
     }
 
-    private void requestToSaveAlert(AlertBody alertBody) {
-        System.out.println(alertBody.toString());
-        Call<ResponseBody> responseBodyCall = service.saveNewAlert(alertBody);
+    private void requestToSaveAlert(NewAlertBody newAlertBody) {
+        System.out.println(newAlertBody.toString());
+        Call<ResponseBody> responseBodyCall = service.saveNewAlert(newAlertBody);
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

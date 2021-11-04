@@ -12,11 +12,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.activities.MainActivity;
-import com.example.alertmeapp.activities.SignInActivity;
 import com.example.alertmeapp.api.AlertMeService;
 import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.api.SignUpBody;
+import com.example.alertmeapp.api.serverRequest.SignUpBody;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;

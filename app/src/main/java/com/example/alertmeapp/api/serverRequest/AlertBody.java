@@ -1,10 +1,8 @@
 package com.example.alertmeapp.api.serverRequest;
 
-import com.google.gson.annotations.SerializedName;
+public class AlertBody {
 
-import java.util.Date;
-
-public class NewAlertBody {
+    private Long id;
     private Long userId;
     private Long alertTypeId;
     private String title;
@@ -13,8 +11,10 @@ public class NewAlertBody {
     private double latitude;
     private double longitude;
     private String expire_date;
+    private AlertType alertType;
 
-    public NewAlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date) {
+    public AlertBody(Long id, Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date, AlertType alertType) {
+        this.id = id;
         this.userId = userId;
         this.alertTypeId = alertTypeId;
         this.title = title;
@@ -23,8 +23,16 @@ public class NewAlertBody {
         this.latitude = latitude;
         this.longitude = longitude;
         this.expire_date = expire_date;
+        this.alertType = alertType;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getUserId() {
         return userId;
@@ -90,9 +98,18 @@ public class NewAlertBody {
         this.expire_date = expire_date;
     }
 
+    public AlertType getAlertType() {
+        return alertType;
+    }
+
+    public void setAlertType(AlertType alertType) {
+        this.alertType = alertType;
+    }
+
     @Override
     public String toString() {
-        return "NewAlertBody{" +
+        return "AlertBody{" +
+                "id=" + id +
                 ", userId=" + userId +
                 ", alertTypeId=" + alertTypeId +
                 ", title='" + title + '\'' +
@@ -103,4 +120,5 @@ public class NewAlertBody {
                 ", expire_date='" + expire_date + '\'' +
                 '}';
     }
+
 }

@@ -8,20 +8,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.dummy.DummyContent.DummyItem;
+import com.example.alertmeapp.dummy.AlertContent.AlertItem;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
+ * {@link RecyclerView.Adapter} that can display a {@link AlertItem}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<AlertItem> alertList;
 
-    public MyListRecyclerViewAdapter(List<DummyItem> items) {
-        mValues = items;
+    public MyListRecyclerViewAdapter(List<AlertItem> items) {
+        alertList = items;
     }
 
     @Override
@@ -33,14 +33,14 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.titleView.setText(mValues.get(position).id);
-        holder.typeView.setText(mValues.get(position).content);
-        holder.rangeView.setText(mValues.get(position).id + 500 + "m");
+        holder.titleView.setText(alertList.get(position).title);
+        holder.typeView.setText(alertList.get(position).alertType);
+        holder.rangeView.setText(alertList.get(position).distance);
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return alertList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -48,7 +48,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         public final TextView titleView;
         public final TextView typeView;
         public final TextView rangeView;
-        public DummyItem mItem;
 
         public ViewHolder(View view) {
             super(view);
