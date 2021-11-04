@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.example.alertmeapp.api.RestAdapter;
 import com.example.alertmeapp.api.serverRequest.SignUpBody;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        displayToast("Error occurred");
                     }
                 });
             }
@@ -110,19 +113,23 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private Optional<String> handleInputEmail(){
-        if (!Patterns.EMAIL_ADDRESS.matcher(tilEmail.getEditText().getText()).matches()) {
-            tilEmail.setErrorEnabled(true);
-            return Optional.of("incorrect email");
-        }
-        return Optional.empty();
+        String email = tilEmail.getEditText().getText().toString();
+        if(Patterns.EMAIL_ADDRESS.matcher(email).matches() || TextUtils.isEmpty(email))
+            return Optional.empty();
+        tilEmail.setErrorEnabled(true);
+        tilEmail.setError(" ");
+        return Optional.of("incorrect email");
     }
 
     private Optional<String> handleInputPasswords(){
         String passwordStr = tilPassword.getEditText().getText().toString();
         String repeatedPasswordStr = tilRepeatedPassword.getEditText().getText().toString();
         if (!TextUtils.isEmpty(passwordStr) && !TextUtils.isEmpty(repeatedPasswordStr)) {
-            if (!repeatedPasswordStr.equals(passwordStr))
+            if (!repeatedPasswordStr.equals(passwordStr)){
+                tilRepeatedPassword.setErrorEnabled(true);
+                tilRepeatedPassword.setError(" ");
                 return Optional.of("passwords must be the same");
+            }
         }
         return Optional.empty();
     }
@@ -154,5 +161,10 @@ public class SignUpActivity extends AppCompatActivity {
     private void changeActivityTo(Class<?> activity) {
         Intent intent = new Intent(getApplicationContext(), activity);
         startActivity(intent);
+    }
+
+    private void displayToast(String message) {
+        Toast.makeText(SignUpActivity.this, message,
+                Toast.LENGTH_LONG).show();
     }
 }

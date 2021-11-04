@@ -28,4 +28,8 @@ public interface AlertMeService {
 
     @POST("/api/alerts")
     Call<ResponseBody> saveNewAlert(@Body NewAlertBody newAlertBody);
+
+    @GET("/api/alerts")
+    Call<ResponseBody> getAlerts();
+
 }
