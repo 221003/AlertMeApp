@@ -33,9 +33,9 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.titleView.setText(mValues.get(position).id);
+        holder.typeView.setText(mValues.get(position).content);
+        holder.rangeView.setText(mValues.get(position).id + 500 + "m");
     }
 
     @Override
@@ -45,20 +45,18 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        public final TextView titleView;
+        public final TextView typeView;
+        public final TextView rangeView;
         public DummyItem mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            titleView = (TextView) view.findViewById(R.id.titleTextView);
+            typeView = (TextView) view.findViewById(R.id.typeTextView);
+            rangeView = (TextView) view.findViewById(R.id.rangeTextView);
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
     }
 }

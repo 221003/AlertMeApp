@@ -36,4 +36,8 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="shared_preferences">allertme_shared_preferences</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="type">Type</string>
+    <string name="range">Range</string>
 </resources>

@@ -63,8 +63,10 @@ public class ListFragment extends Fragment {
             RecyclerView recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                System.out.println("halo1");
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                System.out.println("halo2");
             }
             recyclerView.setAdapter(new MyListRecyclerViewAdapter(DummyContent.ITEMS));
         }
