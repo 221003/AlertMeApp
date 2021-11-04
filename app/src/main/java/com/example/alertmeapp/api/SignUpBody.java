@@ -9,7 +9,6 @@ public class SignUpBody {
     @SerializedName("last_name")
     private String lastName;
     private String login;
-    @SerializedName("password_hash")
     private String password;
 
     public SignUpBody(String email, String fistName, String lastName, String login, String password) {
