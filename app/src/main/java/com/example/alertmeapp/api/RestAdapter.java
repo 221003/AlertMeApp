@@ -10,7 +10,7 @@ public class RestAdapter {
     public static AlertMeService getAlertMeService() {
         if(retrofit == null){
              retrofit = new Retrofit.Builder()
-                    .baseUrl("https://alertme-app.herokuapp.com/")
+                    .baseUrl("http://10.0.2.2:8080/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             alertMeService = retrofit.create(AlertMeService.class);

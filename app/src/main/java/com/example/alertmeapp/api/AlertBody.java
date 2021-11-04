@@ -2,6 +2,7 @@ package com.example.alertmeapp.api;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class AlertBody {
@@ -13,8 +14,9 @@ public class AlertBody {
     private double latitude;
     private double longitude;
     private String expire_date;
+    private String image;
 
-    public AlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date) {
+    public AlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date, String image) {
         this.userId = userId;
         this.alertTypeId = alertTypeId;
         this.title = title;
@@ -23,6 +25,7 @@ public class AlertBody {
         this.latitude = latitude;
         this.longitude = longitude;
         this.expire_date = expire_date;
+        this.image = image;
     }
 
     public Long getUserId() {
@@ -89,6 +92,14 @@ public class AlertBody {
         this.expire_date = expire_date;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "AlertBody{" +
@@ -100,6 +111,7 @@ public class AlertBody {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", expire_date='" + expire_date + '\'' +
+                ", image=" + image +
                 '}';
     }
 }

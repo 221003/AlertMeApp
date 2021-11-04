@@ -10,10 +10,12 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +49,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -214,7 +217,20 @@ public class AlertFormFragment extends Fragment {
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
             requestToSaveAlert(new AlertBody(Long.valueOf(LoggedInUser.getInstance(null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-                    , title, description, 0, latitude, longitude, getCurrentDate()));
+                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
+        }
+    }
+
+    private String getUploadedPhotoBytesArray() {
+        BitmapDrawable drawable = (BitmapDrawable) uploadedPhotoView.getDrawable();
+        if (drawable != null) {
+            Bitmap bitmap = drawable.getBitmap();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        }
+        else {
+            return null;
         }
     }
 
