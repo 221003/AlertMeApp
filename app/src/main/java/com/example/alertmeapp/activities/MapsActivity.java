@@ -75,8 +75,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng getCordsFromBundle() {
         Bundle extras = getIntent().getExtras();
-        Double longitude = 51.759;
-        Double latitude = 19.457;
+        double longitude = 19.457;
+        double latitude =  51.759;
         if (extras != null) {
             longitude = extras.getDouble("longitude");
             latitude = extras.getDouble("latitude");
