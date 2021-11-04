@@ -139,6 +139,7 @@ public class AlertFormFragment extends Fragment {
         } else {
             uploadedPhotoView.setVisibility(View.INVISIBLE);
         }
+
         return view;
     }
 
@@ -178,7 +179,7 @@ public class AlertFormFragment extends Fragment {
 
             @Override
             public void onFailure(Call<AlertTypeResponse> call, Throwable t) {
-                displayToast();
+                displayToast("Error occurred");
                 ArrayAdapter<String> adapter = null;
                 try {
                     adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, new String[0]);
@@ -235,17 +236,16 @@ public class AlertFormFragment extends Fragment {
     }
 
     private void requestToSaveAlert(AlertBody alertBody) {
-        System.out.println(alertBody.toString());
         Call<ResponseBody> responseBodyCall = service.saveNewAlert(alertBody);
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
-                    System.out.println("udalo sie");
+                    clearInputs();
+                    displayToast("Alert added");
                 } else {
-                    System.out.println("nie udalo sie");
                     try {
-                        System.out.println(response.errorBody().string());
+                        displayToast("Error: " + response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -253,10 +253,19 @@ public class AlertFormFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                displayToast();
+                displayToast("Error occurred");
             }
         });
     }
+
+    private void clearInputs() {
+        titleView.setText("");
+        descriptionView.setText("");
+        latitude = null;
+        longitude = null;
+        uploadedPhotoView.setImageBitmap(null);
+    }
+
 
     public void onChoosePhotoClick(View view) {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -372,8 +381,8 @@ public class AlertFormFragment extends Fragment {
         startActivity(i);
     }
 
-    private void displayToast() {
-        Toast.makeText(getContext(), "Error occurred",
+    private void displayToast(String message) {
+        Toast.makeText(getContext(), message,
                 Toast.LENGTH_LONG).show();
     }
 
