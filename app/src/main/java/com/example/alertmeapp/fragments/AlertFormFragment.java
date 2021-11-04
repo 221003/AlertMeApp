@@ -205,6 +205,7 @@ public class AlertFormFragment extends Fragment {
         }
 
         if (!descriptionValid) {
+            titleInvalidView.setText(INVALID_TITLE);
             descriptionInvalidView.setText(INVALID_DESCRIPTION);
         } else {
             descriptionInvalidView.setText("");
@@ -213,7 +214,7 @@ public class AlertFormFragment extends Fragment {
         if (longitude == null || latitude == null) {
             localizationInvalid.setText(INVALID_LOCALIZATION);
         } else {
-            descriptionInvalidView.setText("");
+            localizationInvalid.setText("");
         }
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
