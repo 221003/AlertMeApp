@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
 public class AlertBody {
+    private Long id;
     private Long userId;
     private Long alertTypeId;
     private String title;
@@ -14,7 +15,8 @@ public class AlertBody {
     private double longitude;
     private String expire_date;
 
-    public AlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date) {
+    public AlertBody(Long id, Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date) {
+        this.id = id;
         this.userId = userId;
         this.alertTypeId = alertTypeId;
         this.title = title;
@@ -23,6 +25,14 @@ public class AlertBody {
         this.latitude = latitude;
         this.longitude = longitude;
         this.expire_date = expire_date;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getUserId() {
@@ -92,7 +102,8 @@ public class AlertBody {
     @Override
     public String toString() {
         return "AlertBody{" +
-                "userId=" + userId +
+                "id=" + id +
+                ", userId=" + userId +
                 ", alertTypeId=" + alertTypeId +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

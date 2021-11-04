@@ -54,19 +54,38 @@ public class DummyContent {
      * A dummy item representing a piece of content.
      */
     public static class DummyItem {
-        public final String id;
-        public final String content;
-        public final String details;
+        public final Long userId;
+        public final Long alertTypeId;
+        public final String title;
+        public final String description;
+        public final int number_of_votes;
+        public final double latitude;
+        public final double longitude;
+        public final String expire_date;
 
-        public DummyItem(String id, String content, String details) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
+        public DummyItem(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date) {
+            this.userId = userId;
+            this.alertTypeId = alertTypeId;
+            this.title = title;
+            this.description = description;
+            this.number_of_votes = number_of_votes;
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.expire_date = expire_date;
         }
 
         @Override
         public String toString() {
-            return content;
+            return "DummyItem{" +
+                    "userId=" + userId +
+                    ", alertTypeId=" + alertTypeId +
+                    ", title='" + title + '\'' +
+                    ", description='" + description + '\'' +
+                    ", number_of_votes=" + number_of_votes +
+                    ", latitude=" + latitude +
+                    ", longitude=" + longitude +
+                    ", expire_date='" + expire_date + '\'' +
+                    '}';
         }
     }
 }
