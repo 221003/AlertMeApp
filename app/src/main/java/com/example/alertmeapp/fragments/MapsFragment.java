@@ -162,6 +162,7 @@ public class MapsFragment extends Fragment {
     }
 
     public void getLastLocation() {
+        System.out.println("bylem");
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
@@ -171,8 +172,12 @@ public class MapsFragment extends Fragment {
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {
+                                    System.out.println("bylem1");
+                                    System.out.println(location.getLatitude()+" "+location.getLongitude());
                                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 11));
                                 } else {
+                                    System.out.println("bylem2");
+
                                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
                                 }
                             }
@@ -180,6 +185,8 @@ public class MapsFragment extends Fragment {
                 ).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                System.out.println("bylem3");
+
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
             }
         });

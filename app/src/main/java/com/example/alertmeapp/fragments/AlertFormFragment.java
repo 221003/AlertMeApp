@@ -121,7 +121,7 @@ public class AlertFormFragment extends Fragment {
         buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
         buttonLocalization.setOnClickListener(this::onChooseLocalization);
 
-        //getLastLocation();
+        getLastLocation();
         categorySpinner = view.findViewById(R.id.alert_form_category);
         populateCategorySpinner();
 
