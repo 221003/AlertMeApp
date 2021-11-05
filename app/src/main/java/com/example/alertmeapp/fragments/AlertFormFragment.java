@@ -377,8 +377,8 @@ public class AlertFormFragment extends Fragment {
 
     public void onChooseLocalization(View view) {
         Intent i = new Intent(getActivity(), MapsActivity.class);
-//        i.putExtra("longitude", lastLocation.getLongitude());
-//        i.putExtra("latitude", lastLocation.getLatitude());
+        i.putExtra("longitude", lastLocation.getLongitude());
+        i.putExtra("latitude", lastLocation.getLatitude());
         startActivity(i);
     }
 
