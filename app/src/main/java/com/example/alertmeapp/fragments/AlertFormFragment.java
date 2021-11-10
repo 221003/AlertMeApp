@@ -220,7 +220,7 @@ public class AlertFormFragment extends Fragment {
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
             requestToSaveAlert(new NewAlertBody(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-                    , title, description, 0, latitude, longitude, getCurrentDate()));
+                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
         }
     }
 
@@ -246,6 +246,7 @@ public class AlertFormFragment extends Fragment {
             }
         });
     }
+
     private String getUploadedPhotoBytesArray() {
         BitmapDrawable drawable = (BitmapDrawable) uploadedPhotoView.getDrawable();
         if (drawable != null) {

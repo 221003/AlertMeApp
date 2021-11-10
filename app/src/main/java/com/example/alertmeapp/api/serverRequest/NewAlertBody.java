@@ -13,8 +13,9 @@ public class NewAlertBody {
     private double latitude;
     private double longitude;
     private String expire_date;
+    private String image;
 
-    public NewAlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date) {
+    public NewAlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date, String image) {
         this.userId = userId;
         this.alertTypeId = alertTypeId;
         this.title = title;
@@ -23,8 +24,8 @@ public class NewAlertBody {
         this.latitude = latitude;
         this.longitude = longitude;
         this.expire_date = expire_date;
+        this.image = image;
     }
-
 
     public Long getUserId() {
         return userId;
@@ -90,10 +91,18 @@ public class NewAlertBody {
         this.expire_date = expire_date;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "NewAlertBody{" +
-                ", userId=" + userId +
+                "userId=" + userId +
                 ", alertTypeId=" + alertTypeId +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
@@ -101,6 +110,7 @@ public class NewAlertBody {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", expire_date='" + expire_date + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }
