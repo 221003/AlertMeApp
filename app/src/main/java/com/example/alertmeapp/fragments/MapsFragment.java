@@ -1,18 +1,18 @@
 package com.example.alertmeapp.fragments;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.AlertMeService;
@@ -47,6 +47,7 @@ import retrofit2.Response;
 
 public class MapsFragment extends Fragment {
 
+    private static final int TRANSLATION_Y = 1100;
     private static String[] PERMISSIONS_LOCALIZATION = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -71,6 +72,9 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            LinearLayout details = getView().findViewById(R.id.maps_details);
+            details.setOnClickListener(view -> details.animate().translationYBy(TRANSLATION_Y));
+
             map = googleMap;
             getLastLocation();
             getAlerts();
@@ -80,7 +84,9 @@ public class MapsFragment extends Fragment {
                         .filter(e -> e.getKey().equals(marker))
                         .map(Map.Entry::getValue)
                         .findFirst();
-                //TODO Display detail information about an alert
+
+                details.animate().translationYBy(-TRANSLATION_Y);
+
                 return true;
             });
         }
