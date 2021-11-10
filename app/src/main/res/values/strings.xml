@@ -40,4 +40,9 @@
     <string name="description">Description</string>
     <string name="type">Type</string>
     <string name="range">Range</string>
+    <string name="maps_title">Title:</string>
+    <string name="maps_category">Category:</string>
+    <string name="maps_location">Location:</string>
+    <string name="maps_distance_to">Distance to:</string>
+    <string name="maps_description">Description:</string>
 </resources>
