@@ -35,6 +35,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.activities.MapsActivity;
@@ -230,14 +232,11 @@ public class AlertFormFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
-                    System.out.println("udalo sie");
+                    NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                    navController.navigate(R.id.mapsFragment);
+                    displayToast("Alert added");
                 } else {
-                    System.out.println("nie udalo sie");
-                    try {
-                        System.out.println(response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    displayToast("Error on save new alert");
                 }
             }
             @Override
