@@ -2,6 +2,7 @@ package com.example.alertmeapp.dummy;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.dummy.AlertContent.AlertItem;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -36,6 +38,27 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.titleView.setText(alertList.get(position).title);
         holder.typeView.setText(alertList.get(position).alertType);
         holder.rangeView.setText(alertList.get(position).distance);
+        int color = getColorBasedOnAlertType(alertList.get(position).alertType);
+        holder.materialCardView.setStrokeColor(color);
+    }
+
+    private int getColorBasedOnAlertType(String alertType) {
+        int color = 0;
+        switch (alertType) {
+            case "danger":
+                color = Color.parseColor("#960018"); //CARMINE
+                break;
+            case "warning":
+                color = Color.parseColor("#FF8000"); //ORANGE
+                break;
+            case "information":
+                color = Color.parseColor("#007FFF"); //AZURE
+                break;
+            case "curiosity":
+                color = Color.GREEN;
+                break;
+        }
+        return color;
     }
 
     @Override
@@ -43,15 +66,17 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         return alertList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView titleView;
         public final TextView typeView;
         public final TextView rangeView;
+        public final MaterialCardView materialCardView;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            materialCardView = view.findViewById(R.id.material_card);
             titleView = (TextView) view.findViewById(R.id.titleTextView);
             typeView = (TextView) view.findViewById(R.id.typeTextView);
             rangeView = (TextView) view.findViewById(R.id.rangeTextView);
