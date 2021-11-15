@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/maps_details"
         android:layout_width="match_parent"
-        android:layout_height="700dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/details_background"
         android:orientation="vertical"
         android:padding="20dp"

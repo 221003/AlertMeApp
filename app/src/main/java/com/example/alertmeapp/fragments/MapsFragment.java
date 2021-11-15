@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +34,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,8 +53,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MapsFragment extends Fragment {
-
-    private static final int TRANSLATION_Y = 1500;
     private static String[] PERMISSIONS_LOCALIZATION = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -83,7 +78,7 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             LinearLayout details = getView().findViewById(R.id.maps_details);
-            details.setOnClickListener(view -> details.animate().translationYBy(TRANSLATION_Y));
+            details.setOnClickListener(view -> details.animate().translationYBy(getView().getHeight()));
 
             map = googleMap;
             getLastLocation();
@@ -95,10 +90,16 @@ public class MapsFragment extends Fragment {
                         .map(Map.Entry::getValue)
                         .findFirst();
 
-                details.animate().translationYBy(-TRANSLATION_Y);
+                details.animate().translationY(-getView().getHeight());
                 populateDetailsBox((JsonObject) alert.get());
 
                 return true;
+            });
+
+            googleMap.setOnMapLoadedCallback(() -> {
+                ViewGroup.LayoutParams params = details.getLayoutParams();
+                params.height = getView().getHeight();
+                details.setLayoutParams(params);
             });
         }
     };
