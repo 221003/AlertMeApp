@@ -2,6 +2,7 @@ package com.example.alertmeapp.fragments.alert.list;
 
 import android.location.Location;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.api.retrofit.AlertMeService;
@@ -19,10 +20,13 @@ import retrofit2.Response;
 
 public class AlertContent {
 
-    private final List<AlertItem> alertItems = new ArrayList<AlertItem>();
+    private final MyListRecyclerViewAdapter adapter;
     private final RecyclerView recyclerView;
+    private final List<AlertItem> items;
 
-    public AlertContent(RecyclerView recyclerView) {
+    public AlertContent(RecyclerView recyclerView, MyListRecyclerViewAdapter adapter, List<AlertItem> items) {
+        this.adapter = adapter;
+        this.items = items;
         this.recyclerView = recyclerView;
         getAlerts();
     }
@@ -37,9 +41,10 @@ public class AlertContent {
                 if (response.isSuccessful()) {
                     List<Alert> alerts = response.body().getData();
                     alerts.forEach(alert -> {
-                        alertItems.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
+                        items.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
                     });
-                    recyclerView.setAdapter(new MyListRecyclerViewAdapter(alertItems));
+                    adapter.notifyDataSetChanged();
+                    recyclerView.setAdapter(adapter);
                 } else {
                     System.out.println("Unsuccessful to fetch all alerts AlertContent.class");
                 }
