@@ -47,7 +47,7 @@ import retrofit2.Response;
 
 public class MapsFragment extends Fragment {
 
-    private static final int TRANSLATION_Y = 1100;
+    private static final int TRANSLATION_Y = 1500;
     private static String[] PERMISSIONS_LOCALIZATION = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
