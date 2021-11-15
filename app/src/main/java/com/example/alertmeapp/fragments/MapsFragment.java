@@ -102,23 +102,22 @@ public class MapsFragment extends Fragment {
         String title = alert.get("title").getAsString();
         String alertType = alert.get("alertType").getAsJsonObject().get("name").getAsString();
         String description = alert.get("description").getAsString();
-        description = description.substring(0,1).toUpperCase() + description.substring(1).toLowerCase();
+        description = description.substring(0, 1).toUpperCase() + description.substring(1).toLowerCase();
         Double latitude = alert.get("latitude").getAsDouble();
         Double longitude = alert.get("longitude").getAsDouble();
-        String distanceTo = "TODO";
         String image = alert.get("image").getAsString();
+
         String address = getAlertAddress(latitude, longitude);
+        setDistanceTo(latitude, longitude);
 
         TextView titleView = getView().findViewById(R.id.maps_title);
         TextView categoryView = getView().findViewById(R.id.maps_category);
         TextView locationView = getView().findViewById(R.id.maps_location);
-        TextView distanceToView = getView().findViewById(R.id.maps_distance_to);
         TextView descriptionView = getView().findViewById(R.id.maps_description);
 
         titleView.setText(title);
         categoryView.setText(alertType);
         locationView.setText(address);
-        distanceToView.setText(distanceTo);
         descriptionView.setText(description);
     }
 
@@ -138,6 +137,27 @@ public class MapsFragment extends Fragment {
         return splitAddress[0] + ", " + splitAddress[1];
     }
 
+    private void setDistanceTo(Double latitude, Double longitude) {
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
+        }
+
+        TextView distanceToView = getView().findViewById(R.id.maps_distance_to);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), location -> {
+                    if (location != null) {
+                        Location current = new Location(location);
+                        current.setLatitude(latitude);
+                        current.setLongitude(longitude);
+                        int distance = (int) location.distanceTo(current);
+                        distanceToView.setText(String.valueOf(distance) + " km");
+                    } else {
+                        distanceToView.setText("Unknown");
+                    }
+                }
+                ).addOnFailureListener(e -> distanceToView.setText("Unknown"));
+    }
     private BitmapDescriptor getColorMarker(String alertType){
         switch (alertType) {
             case "danger":
@@ -213,28 +233,19 @@ public class MapsFragment extends Fragment {
     }
 
     public void getLastLocation() {
-        System.out.println("bylem");
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
         }
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    System.out.println(location.getLatitude()+" "+location.getLongitude());
-                                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 11));
-                                } else {
-                                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
-                                }
-                            }
-                        }
-                ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
-            }
-        });
+                .addOnSuccessListener(getActivity(), location -> {
+                    if (location != null) {
+                        System.out.println(location.getLatitude()+" "+location.getLongitude());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 11));
+                    } else {
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
+                    }
+                }
+                ).addOnFailureListener(e -> map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11)));
     }
 }
