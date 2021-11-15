@@ -2,12 +2,15 @@ package com.example.alertmeapp.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,6 +40,8 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -86,11 +91,52 @@ public class MapsFragment extends Fragment {
                         .findFirst();
 
                 details.animate().translationYBy(-TRANSLATION_Y);
+                populateDetailsBox((JsonObject) alert.get());
 
                 return true;
             });
         }
     };
+
+    private void populateDetailsBox(JsonObject alert) {
+        String title = alert.get("title").getAsString();
+        String alertType = alert.get("alertType").getAsJsonObject().get("name").getAsString();
+        String description = alert.get("description").getAsString();
+        description = description.substring(0,1).toUpperCase() + description.substring(1).toLowerCase();
+        Double latitude = alert.get("latitude").getAsDouble();
+        Double longitude = alert.get("longitude").getAsDouble();
+        String distanceTo = "TODO";
+        String image = alert.get("image").getAsString();
+        String address = getAlertAddress(latitude, longitude);
+
+        TextView titleView = getView().findViewById(R.id.maps_title);
+        TextView categoryView = getView().findViewById(R.id.maps_category);
+        TextView locationView = getView().findViewById(R.id.maps_location);
+        TextView distanceToView = getView().findViewById(R.id.maps_distance_to);
+        TextView descriptionView = getView().findViewById(R.id.maps_description);
+
+        titleView.setText(title);
+        categoryView.setText(alertType);
+        locationView.setText(address);
+        distanceToView.setText(distanceTo);
+        descriptionView.setText(description);
+    }
+
+    private String getAlertAddress(Double latitude, Double longitude) {
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String address = addresses.get(0).getAddressLine(0);
+        String[] splitAddress = address.split(",");
+
+        return splitAddress[0] + ", " + splitAddress[1];
+    }
 
     private BitmapDescriptor getColorMarker(String alertType){
         switch (alertType) {
@@ -115,7 +161,6 @@ public class MapsFragment extends Fragment {
             String alertType = alert.getAsJsonObject().get("alertType")
                     .getAsJsonObject().get("name").getAsString();
             LatLng latlng = new LatLng(latitude, longitude);
-            System.out.println(alertType);
             BitmapDescriptor bitmap = getColorMarker(alertType);
             Marker marker = map.addMarker(
                     new MarkerOptions().position(latlng).icon(bitmap).title(title)
@@ -178,12 +223,9 @@ public class MapsFragment extends Fragment {
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {
-                                    System.out.println("bylem1");
                                     System.out.println(location.getLatitude()+" "+location.getLongitude());
                                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 11));
                                 } else {
-                                    System.out.println("bylem2");
-
                                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
                                 }
                             }
@@ -191,8 +233,6 @@ public class MapsFragment extends Fragment {
                 ).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                System.out.println("bylem3");
-
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
             }
         });
