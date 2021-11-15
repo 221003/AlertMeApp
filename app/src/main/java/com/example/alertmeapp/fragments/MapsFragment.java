@@ -2,13 +2,17 @@ package com.example.alertmeapp.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -39,6 +43,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -109,6 +114,7 @@ public class MapsFragment extends Fragment {
 
         String address = getAlertAddress(latitude, longitude);
         setDistanceTo(latitude, longitude);
+        setAlertImage(image);
 
         TextView titleView = getView().findViewById(R.id.maps_title);
         TextView categoryView = getView().findViewById(R.id.maps_category);
@@ -158,6 +164,14 @@ public class MapsFragment extends Fragment {
                 }
                 ).addOnFailureListener(e -> distanceToView.setText("Unknown"));
     }
+
+    private void setAlertImage(String image) {
+        byte[] decodedImage = Base64.getDecoder().decode(image);
+        Bitmap bitmapImage = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
+        ImageView imageView = getView().findViewById(R.id.maps_image);
+        imageView.setImageBitmap(bitmapImage);
+    }
+
     private BitmapDescriptor getColorMarker(String alertType){
         switch (alertType) {
             case "danger":
