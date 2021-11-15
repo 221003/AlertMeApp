@@ -1,15 +1,14 @@
-package com.example.alertmeapp.dummy;
+package com.example.alertmeapp.fragments.alert.list;
 
 import android.location.Location;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.serverRequest.AlertBody;
-import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.api.serverRequest.User;
-import com.example.alertmeapp.api.serverResponse.AllAlertsResponse;
-import com.example.alertmeapp.logedInUser.LoggedInUser;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.data.Alert;
+import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.loggedInUser.LoggedInUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,14 @@ public class AlertContent {
 
     private void getAlerts() {
         AlertMeService service = RestAdapter.getAlertMeService();
-        Call<AllAlertsResponse> allAlerts = service.getAllAlerts();
-        allAlerts.enqueue(new Callback<AllAlertsResponse>() {
+        Call<ResponseMultipleData<Alert>> allAlerts = service.getAllAlerts();
+        allAlerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
+
             @Override
-            public void onResponse(Call<AllAlertsResponse> call, Response<AllAlertsResponse> response) {
+            public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
                 if (response.isSuccessful()) {
-                    List<AlertBody> allAlert = response.body().getAllAlert();
-                    allAlert.forEach(alert -> {
+                    List<Alert> alerts = response.body().getData();
+                    alerts.forEach(alert -> {
                         alertItems.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
                     });
                     recyclerView.setAdapter(new MyListRecyclerViewAdapter(alertItems));
@@ -46,15 +46,15 @@ public class AlertContent {
             }
 
             @Override
-            public void onFailure(Call<AllAlertsResponse> call, Throwable t) {
-                System.out.println("2Failed to fetch all alerts AlertContent.class");
+            public void onFailure(Call<ResponseMultipleData<Alert>> call, Throwable t) {
+                System.out.println("Failed to fetch all alerts AlertContent.class");
             }
         });
     }
 
     private String countDistance(double longitude, double latitude) {
-        //LoggedInUser user = LoggedInUser.getInstance(null, null, null);
-        LoggedInUser user = LoggedInUser.getInstance(new User(1, "John", "Doe"),"19.435954", "51.79491");
+        LoggedInUser user = LoggedInUser.getInstance(null, null, null);
+        //LoggedInUser user = LoggedInUser.getInstance(new User(1L, "John", "Doe"), "19.435954", "51.79491");
         Location userLocation = new Location("point A");
         userLocation.setLatitude(Float.parseFloat(user.getLastLatitude()));
         userLocation.setLongitude(Float.parseFloat(user.getLastLongitude()));
@@ -72,32 +72,6 @@ public class AlertContent {
         }
         return res;
     }
-
-//    public static class AlertItem {
-//        public final String alertType;
-//        public final String title;
-//        public final String distance;
-//        public final int numberOfVotes;
-//
-//        public AlertItem(String alertType, String title, String distance, int numberOfVotes) {
-//            this.alertType = alertType;
-//            this.title = title;
-//            this.distance = distance;
-//            this.numberOfVotes = numberOfVotes;
-//        }
-//
-//
-//        @Override
-//        public String toString() {
-//            return "AlertItem{" +
-//                    "alertType='" + alertType + '\'' +
-//                    ", title='" + title + '\'' +
-//                    ", distance='" + distance + '\'' +
-//                    ", numberOfVotes=" + numberOfVotes +
-//                    '}';
-//        }
-//    }
-
 
 
 }

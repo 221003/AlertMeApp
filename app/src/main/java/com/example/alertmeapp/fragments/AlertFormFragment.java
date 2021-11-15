@@ -40,12 +40,11 @@ import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.activities.MapsActivity;
-import com.example.alertmeapp.api.serverRequest.NewAlertBody;
-import com.example.alertmeapp.api.serverRequest.AlertBody;
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.serverRequest.AlertType;
-import com.example.alertmeapp.api.serverResponse.AlertTypeResponse;
-import com.example.alertmeapp.api.RestAdapter;
+import com.example.alertmeapp.api.requests.AlertRequest;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.data.AlertType;
+import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.logedInUser.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -53,7 +52,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -106,7 +104,7 @@ public class AlertFormFragment extends Fragment {
     private Double longitude;
     private Double latitude;
     private final AlertMeService service = RestAdapter.getAlertMeService();
-    private List<AlertType> alertTypes = new ArrayList<>();
+    private List<AlertType> alertTypeRequests = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -163,13 +161,13 @@ public class AlertFormFragment extends Fragment {
     private void populateCategorySpinner() {
         List<String> categories = new ArrayList<>(5);
 
-        Call<AlertTypeResponse> allAlertTypes = service.getAllAlertTypes();
-        allAlertTypes.enqueue(new Callback<AlertTypeResponse>() {
+        Call<ResponseMultipleData<AlertType>> allAlertTypes = service.getAllAlertTypes();
+        allAlertTypes.enqueue(new Callback<ResponseMultipleData<AlertType>>() {
             @Override
-            public void onResponse(Call<AlertTypeResponse> call, Response<AlertTypeResponse> response) {
-                for (AlertType alertType : response.body().getAllAlertTypes()) {
-                    categories.add(alertType.getName());
-                    alertTypes.add(alertType);
+            public void onResponse(Call<ResponseMultipleData<AlertType>> call, Response<ResponseMultipleData<AlertType>> response) {
+                for (AlertType alertTypeRequest : response.body().getData()) {
+                    categories.add(alertTypeRequest.getName());
+                    alertTypeRequests.add(alertTypeRequest);
                 }
                 ArrayAdapter<String> adapter = null;
                 try {
@@ -181,7 +179,7 @@ public class AlertFormFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<AlertTypeResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseMultipleData<AlertType>> call, Throwable t) {
                 displayToast("Error occurred");
                 ArrayAdapter<String> adapter = null;
                 try {
@@ -221,13 +219,24 @@ public class AlertFormFragment extends Fragment {
         }
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
-            requestToSaveAlert(new NewAlertBody(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
+            AlertRequest alertRequest = new AlertRequest.Builder()
+                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
+                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
+                    .withDescription(description)
+                    .withTitle(title)
+                    .withLatitude(latitude)
+                    .withLongitude(longitude)
+                    .withNumberOfVotes(0)
+                    .withImage(getUploadedPhotoBytesArray())
+                    .build();
+            requestToSaveAlert(alertRequest);
+//            requestToSaveAlert(new AlertRequest(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
+//                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
         }
     }
 
-    private void requestToSaveAlert(NewAlertBody newAlertBody) {
-        Call<ResponseBody> responseBodyCall = service.saveNewAlert(newAlertBody);
+    private void requestToSaveAlert(AlertRequest alertRequest) {
+        Call<ResponseBody> responseBodyCall = service.saveNewAlert(alertRequest);
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -395,8 +404,8 @@ public class AlertFormFragment extends Fragment {
     }
 
     private AlertType getSelectedCategoryAlertType(String category) {
-        AlertType selectedCategory = alertTypes.stream()
-                .filter(alertType -> alertType.getName() == category)
+        AlertType selectedCategory = alertTypeRequests.stream()
+                .filter(alertTypeRequest -> alertTypeRequest.getName() == category)
                 .findFirst()
                 .get();
         return selectedCategory;

@@ -1,4 +1,4 @@
-package com.example.alertmeapp.fragments;
+package com.example.alertmeapp.fragments.alert.list;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,11 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.fragments.alert.list.AlertContent;
 
-/**
- * A fragment representing a list of Items.
- */
+
 public class ListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
@@ -64,7 +61,6 @@ public class ListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            //initialize list with items and sets adapter
            new AlertContent(recyclerView);
         }
         return view;

@@ -1,7 +1,6 @@
 package com.example.alertmeapp.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -22,17 +21,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.serverRequest.LoginBody;
-import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.api.serverResponse.ServeLogInResponse;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.data.User;
+import com.example.alertmeapp.api.requests.UserSignInRequest;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.logedInUser.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 
 
 import java.io.IOException;
@@ -140,33 +139,34 @@ public class SignInActivity extends AppCompatActivity {
     private void requestToSignInUser(String email, String password,
                                      TextView emailInvalidElement, TextView passwordInvalidElement) {
         getLastLocation();
-        Call<ServeLogInResponse> call = service.signIn(new LoginBody(email, password));
-        call.enqueue(new Callback<ServeLogInResponse>() {
+        Call<ResponseSingleData<User>> call = service.signIn(new UserSignInRequest(email, password));
+        call.enqueue(new Callback<ResponseSingleData<User>>() {
             @Override
-            public void onResponse(Call<ServeLogInResponse> call, Response<ServeLogInResponse> response) {
+            public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
                 if (response.isSuccessful()) {
-                    LoggedInUser.getInstance(response.body().getUser(), longitude, latitude);
+                    LoggedInUser.getInstance(response.body().getData(), longitude, latitude);
                     changeActivityTo(MainActivity.class);
                 } else {
                     try {
-                        String json = response.errorBody().string();
-                        JsonParser jsonParser = new JsonParser();
-                        JsonObject root = jsonParser.parse(json).getAsJsonObject();
-                        int errorCode = root.get("errorCode").getAsInt();
-                        String errorMessage = root.get("error").getAsString();
+                        Gson gson = new Gson();
+                        ResponseSingleData errorResponse = gson.fromJson(
+                                response.errorBody().string(),
+                                ResponseSingleData.class);
+                        int errorCode = errorResponse.getErrorCode();
+                        String errorMessage = errorResponse.getError();
                         if (errorCode == INCORRECT_LOGIN_CODE)
                             emailInvalidElement.setText(errorMessage);
                         else if (errorCode == INCORRECT_PASSWORD_CODE)
                             passwordInvalidElement.setText(errorMessage);
                     } catch (IOException e) {
-                        e.printStackTrace();
                         displayToast();
                     }
+
                 }
             }
 
             @Override
-            public void onFailure(Call<ServeLogInResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseSingleData<User>> call, Throwable t) {
                 displayToast();
             }
         });
@@ -180,7 +180,7 @@ public class SignInActivity extends AppCompatActivity {
             requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
         }
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener( this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {

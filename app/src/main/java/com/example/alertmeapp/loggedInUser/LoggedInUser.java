@@ -1,6 +1,6 @@
-package com.example.alertmeapp.logedInUser;
+package com.example.alertmeapp.loggedInUser;
 
-import com.example.alertmeapp.api.example.User;
+import com.example.alertmeapp.api.data.User;
 
 public class LoggedInUser {
     private static LoggedInUser loggedUser;
