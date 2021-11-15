@@ -45,7 +45,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
-import com.example.alertmeapp.loggedInUser.LoggedInUser;
+import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -100,7 +100,6 @@ public class AlertFormFragment extends Fragment {
             new ActivityResultContracts.StartActivityForResult(),
             result -> processChosenPhoto(result));
 
-    private Location lastLocation;
     private Double longitude;
     private Double latitude;
     private final AlertMeService service = RestAdapter.getAlertMeService();
@@ -121,7 +120,6 @@ public class AlertFormFragment extends Fragment {
         buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
         buttonLocalization.setOnClickListener(this::onChooseLocalization);
 
-        getLastLocation();
         categorySpinner = view.findViewById(R.id.alert_form_category);
         populateCategorySpinner();
 
@@ -356,38 +354,10 @@ public class AlertFormFragment extends Fragment {
         return !description.isEmpty();
     }
 
-    public void getLastLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    lastLocation = location;
-                                } else {
-                                    lastLocation = new Location("");
-                                    lastLocation.setLatitude(52.237049);
-                                    lastLocation.setLongitude(21.017532);
-                                }
-                            }
-                        }
-                ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                lastLocation = new Location("");
-                lastLocation.setLatitude(52.237049);
-                lastLocation.setLongitude(21.017532);
-            }
-        });
-    }
-
     public void onChooseLocalization(View view) {
         Intent i = new Intent(getActivity(), MapsActivity.class);
-        i.putExtra("longitude", lastLocation.getLongitude());
-        i.putExtra("latitude", lastLocation.getLatitude());
+        i.putExtra("longitude", LoggedInUser.getLoggedUser().getLastLongitude());
+        i.putExtra("latitude", LoggedInUser.getLoggedUser().getLastLatitude());
         startActivity(i);
     }
 

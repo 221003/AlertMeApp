@@ -8,7 +8,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
-import com.example.alertmeapp.loggedInUser.LoggedInUser;
+import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +54,9 @@ public class AlertContent {
 
     private String countDistance(double longitude, double latitude) {
         LoggedInUser user = LoggedInUser.getInstance(null, null, null);
-        //LoggedInUser user = LoggedInUser.getInstance(new User(1L, "John", "Doe"), "19.435954", "51.79491");
         Location userLocation = new Location("point A");
-        userLocation.setLatitude(Float.parseFloat(user.getLastLatitude()));
-        userLocation.setLongitude(Float.parseFloat(user.getLastLongitude()));
+        userLocation.setLatitude(user.getLastLatitude());
+        userLocation.setLongitude(user.getLastLongitude());
 
         Location alertLocation = new Location("point B");
         alertLocation.setLatitude(latitude);

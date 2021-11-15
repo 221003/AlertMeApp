@@ -18,6 +18,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -68,7 +69,10 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             map = googleMap;
-            getLastLocation();
+            LoggedInUser instance = LoggedInUser.getInstance(null, null, null);
+            System.out.println("Od usera: "+instance.getLastLongitude()+" "+instance.getLastLatitude());
+            LatLng latLng = new LatLng(instance.getLastLatitude(), instance.getLastLongitude());
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
             getAlerts();
             googleMap.setOnMarkerClickListener(marker -> {
                 marker.showInfoWindow();
@@ -140,30 +144,5 @@ public class MapsFragment extends Fragment {
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
-    }
-
-    public void getLastLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    System.out.println(location.getLatitude() + " " + location.getLongitude());
-                                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 11));
-                                } else {
-                                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
-                                }
-                            }
-                        }
-                ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
-            }
-        });
     }
 }
