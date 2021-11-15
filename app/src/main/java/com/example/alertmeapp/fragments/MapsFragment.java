@@ -108,11 +108,11 @@ public class MapsFragment extends Fragment {
         String title = alert.get("title").getAsString();
         String alertType = alert.get("alertType").getAsJsonObject().get("name").getAsString();
         String description = alert.get("description").getAsString();
-        description = description.substring(0, 1).toUpperCase() + description.substring(1).toLowerCase();
         Double latitude = alert.get("latitude").getAsDouble();
         Double longitude = alert.get("longitude").getAsDouble();
         String image = alert.get("image").getAsString();
 
+        alertType = alertType.substring(0, 1).toUpperCase() + alertType.substring(1).toLowerCase();
         String address = getAlertAddress(latitude, longitude);
         setDistanceTo(latitude, longitude);
         setAlertImage(image);
