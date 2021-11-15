@@ -1,11 +1,11 @@
 package com.example.alertmeapp.logedInUser;
 
-import com.example.alertmeapp.api.serverRequest.User;
+import com.example.alertmeapp.api.example.User;
 
 public class LoggedInUser {
     private static LoggedInUser loggedUser;
 
-    private Integer id;
+    private Long id;
     private String fistName;
     private String lastName;
     private String lastLongitude;
@@ -27,7 +27,7 @@ public class LoggedInUser {
     }
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

@@ -1,8 +1,8 @@
-package com.example.alertmeapp.api.serverRequest;
+package com.example.alertmeapp.api.requests;
 
 import com.google.gson.annotations.SerializedName;
 
-public class SignUpBody {
+public class UserSignUpRequest {
     private String email;
     @SerializedName("first_name")
     private String fistName;
@@ -11,7 +11,7 @@ public class SignUpBody {
     private String login;
     private String password;
 
-    public SignUpBody(String email, String fistName, String lastName, String login, String password) {
+    public UserSignUpRequest(String email, String fistName, String lastName, String login, String password) {
         this.email = email;
         this.fistName = fistName;
         this.lastName = lastName;

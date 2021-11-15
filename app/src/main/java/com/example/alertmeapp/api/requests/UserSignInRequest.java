@@ -1,10 +1,10 @@
-package com.example.alertmeapp.api.serverRequest;
+package com.example.alertmeapp.api.requests;
 
-public class LoginBody {
+public class UserSignInRequest {
     private String login;
     private String password;
 
-    public LoginBody(String login, String password) {
+    public UserSignInRequest(String login, String password) {
         this.login = login;
         this.password = password;
     }

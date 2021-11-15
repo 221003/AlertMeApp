@@ -13,10 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.dummy.AlertContent;
-import com.example.alertmeapp.dummy.MyListRecyclerViewAdapter;
-
-import java.util.List;
+import com.example.alertmeapp.fragments.alert.list.AlertContent;
 
 /**
  * A fragment representing a list of Items.
@@ -68,7 +65,7 @@ public class ListFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             //initialize list with items and sets adapter
-            AlertContent alertContent = new AlertContent(recyclerView);
+           new AlertContent(recyclerView);
         }
         return view;
     }
