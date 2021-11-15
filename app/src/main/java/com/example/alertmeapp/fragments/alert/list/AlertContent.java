@@ -9,6 +9,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class AlertContent {
                     alerts.forEach(alert -> {
                         items.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
                     });
+                    items.sort(new DistanceComparator());
                     adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
                 } else {

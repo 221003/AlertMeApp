@@ -1,6 +1,7 @@
 package com.example.alertmeapp.fragments.alert.list;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -22,9 +23,12 @@ import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.utils.DistanceComparator;
+import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -75,7 +79,7 @@ public class ListFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String category = categorySpinner.getSelectedItem().toString();
-                if(!category.equals("none")) {
+                if (!category.equals("none")) {
                     List<AlertItem> copyList = new ArrayList<>();
                     for (int i = 0; i < items.size(); i++) {
                         if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
@@ -83,8 +87,9 @@ public class ListFragment extends Fragment {
                             System.out.println(items.get(i).getAlert().toString());
                         }
                     }
+                    copyList.sort(new DistanceComparator());
                     adapter = new MyListRecyclerViewAdapter(copyList);
-                }else{
+                } else {
                     adapter = new MyListRecyclerViewAdapter(items);
                 }
                 recyclerView.setAdapter(adapter);

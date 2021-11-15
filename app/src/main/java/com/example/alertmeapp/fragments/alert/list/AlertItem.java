@@ -3,8 +3,8 @@ package com.example.alertmeapp.fragments.alert.list;
 import com.example.alertmeapp.api.data.Alert;
 
 public class AlertItem {
-    public Alert alert;
-    public String distance;
+    private Alert alert;
+    private String distance;
 
     public AlertItem(Alert alert, String distance) {
         this.alert = alert;
