@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,8 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.RestAdapter;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.data.Alert;
+import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,17 +31,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,7 +50,7 @@ public class MapsFragment extends Fragment {
 
     private static final int REQUEST_LOCATION_CODE = 103;
     private final AlertMeService service = RestAdapter.getAlertMeService();
-    private final Map<Marker, JsonElement> markersAssociatedWithAlerts = new HashMap<>();
+    private final Map<Marker, Alert> markersAssociatedWithAlerts = new HashMap<>();
     private GoogleMap map;
     private final float HUE_CARMINE = 345;
 
@@ -76,7 +72,7 @@ public class MapsFragment extends Fragment {
             getAlerts();
             googleMap.setOnMarkerClickListener(marker -> {
                 marker.showInfoWindow();
-                Optional<JsonElement> alert = markersAssociatedWithAlerts.entrySet().stream()
+                Optional<Alert> alert = markersAssociatedWithAlerts.entrySet().stream()
                         .filter(e -> e.getKey().equals(marker))
                         .map(Map.Entry::getValue)
                         .findFirst();
@@ -86,7 +82,7 @@ public class MapsFragment extends Fragment {
         }
     };
 
-    private BitmapDescriptor getColorMarker(String alertType){
+    private BitmapDescriptor getColorMarker(String alertType) {
         switch (alertType) {
             case "danger":
                 return BitmapDescriptorFactory.defaultMarker(HUE_CARMINE);
@@ -101,43 +97,28 @@ public class MapsFragment extends Fragment {
     }
 
 
-    private void createMarkers(JsonArray data) {
-        for(JsonElement alert : data){
-            double latitude = alert.getAsJsonObject().get("latitude").getAsDouble();
-            double longitude = alert.getAsJsonObject().get("longitude").getAsDouble();
-            String title = alert.getAsJsonObject().get("title").getAsString();
-            String alertType = alert.getAsJsonObject().get("alertType")
-                    .getAsJsonObject().get("name").getAsString();
-            LatLng latlng = new LatLng(latitude, longitude);
-            System.out.println(alertType);
-            BitmapDescriptor bitmap = getColorMarker(alertType);
+    private void createMarkers(List<Alert> alerts) {
+        for (Alert alert : alerts) {
+            LatLng latlng = new LatLng(alert.getLatitude(), alert.getLongitude());
+            BitmapDescriptor bitmap = getColorMarker(alert.getAlertType().getName());
             Marker marker = map.addMarker(
-                    new MarkerOptions().position(latlng).icon(bitmap).title(title)
+                    new MarkerOptions().position(latlng).icon(bitmap).title(alert.getTitle())
             );
             markersAssociatedWithAlerts.put(marker, alert);
         }
     }
-    private JsonArray getParsedDataFrom(Response<ResponseBody> response) throws IOException {
-        String json = response.body().string();
-        JsonParser jsonParser = new JsonParser();
-        JsonObject root = jsonParser.parse(json).getAsJsonObject();
-        return root.getAsJsonArray("data");
-    }
 
-    private void getAlerts(){
-        Call<ResponseBody> call = service.getAlerts();
-        call.enqueue(new Callback<ResponseBody>() {
+    private void getAlerts() {
+        Call<ResponseMultipleData<Alert>> call = service.getAllAlerts();
+        call.enqueue(new Callback<ResponseMultipleData<Alert>>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    JsonArray data = getParsedDataFrom(response);
-                    createMarkers(data);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
+                List<Alert> alerts = response.body().getData();
+                createMarkers(alerts);
             }
+
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ResponseMultipleData<Alert>> call, Throwable t) {
             }
         });
     }
@@ -162,7 +143,6 @@ public class MapsFragment extends Fragment {
     }
 
     public void getLastLocation() {
-        System.out.println("bylem");
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
@@ -172,12 +152,9 @@ public class MapsFragment extends Fragment {
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {
-                                    System.out.println("bylem1");
-                                    System.out.println(location.getLatitude()+" "+location.getLongitude());
+                                    System.out.println(location.getLatitude() + " " + location.getLongitude());
                                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 11));
                                 } else {
-                                    System.out.println("bylem2");
-
                                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
                                 }
                             }
@@ -185,8 +162,6 @@ public class MapsFragment extends Fragment {
                 ).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                System.out.println("bylem3");
-
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.759f, 19.457f), 11));
             }
         });

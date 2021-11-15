@@ -11,7 +11,7 @@
         tools:layout="@layout/fragment_maps" />
     <fragment
         android:id="@+id/listFragment"
-        android:name="com.example.alertmeapp.fragments.ListFragment"
+        android:name="com.example.alertmeapp.fragments.alert.list.ListFragment"
         android:label="fragment_item_list"
         tools:layout="@layout/fragment_item_list" />
     <fragment

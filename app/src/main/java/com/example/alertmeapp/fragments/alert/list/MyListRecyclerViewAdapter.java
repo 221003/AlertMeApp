@@ -1,4 +1,4 @@
-package com.example.alertmeapp.dummy;
+package com.example.alertmeapp.fragments.alert.list;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -9,18 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.serverRequest.AlertBody;
+import com.example.alertmeapp.api.data.Alert;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link AlertItem}.
- * TODO: Replace the implementation with code for your data type.
- */
+
 public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
 
     private final List<AlertItem> alertList;
@@ -28,14 +26,12 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     private final PorterDuffColorFilter RED = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     private final PorterDuffColorFilter GRAY = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
 
-    private ImageView upvote;
-    private ImageView downvote;
-    private TextView alertVotes;
 
     public MyListRecyclerViewAdapter(List<AlertItem> items) {
         alertList = items;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -45,23 +41,19 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        AlertBody alert = alertList.get(position).getAlertBody();
+        Alert alert = alertList.get(position).getAlert();
         String distance = alertList.get(position).getDistance();
 
         holder.titleView.setText(alert.getTitle());
         holder.typeView.setText(alert.getAlertType().getName());
         holder.rangeView.setText(distance);
-        upvote = holder.upvote;
-        downvote = holder.downvote;
-        alertVotes = holder.alertVotes;
         holder.alertVotes.setText(String.valueOf(alert.getNumber_of_votes()));
         int color = getColorBasedOnAlertType(alert.getAlertType().getName());
         holder.materialCardView.setStrokeColor(color);
         holder.upvote.setColorFilter(GRAY);
         holder.downvote.setColorFilter(GRAY);
-        AlertItem alertItem = alertList.get(position);
-        holder.upvote.setOnClickListener(v -> handleUpVote());
-        holder.downvote.setOnClickListener(v -> handleDownVote());
+        holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
+        holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
     }
 
     private int getColorBasedOnAlertType(String alertType) {
@@ -83,43 +75,35 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         return color;
     }
 
-    private void sendVote(){
-
-    }
-
-    private void deleteVote(){
-
-    }
-
-    private void handleUpVote() {
+    private void handleUpVote(ImageView upvote, ImageView downvote, TextView alertVotes, Alert alert) {
         if (upvote.getColorFilter().equals(GRAY)) {
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString()) + 1;
             if (downvote.getColorFilter().equals(RED))
                 numberOfVotes++;
             upvote.setColorFilter(GREEN);
             downvote.setColorFilter(GRAY);
+            alert.setNumber_of_votes(numberOfVotes);
             alertVotes.setText(String.valueOf(numberOfVotes));
         } else if (upvote.getColorFilter().equals(GREEN)) {
             upvote.setColorFilter(GRAY);
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString());
             alertVotes.setText(String.valueOf(--numberOfVotes));
-            deleteVote();
         }
     }
 
-    private void handleDownVote() {
+    private void handleDownVote(ImageView upvote, ImageView downvote, TextView alertVotes, Alert alert) {
         if (downvote.getColorFilter().equals(GRAY)) {
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString()) - 1;
             if (upvote.getColorFilter().equals(GREEN))
                 numberOfVotes--;
             downvote.setColorFilter(RED);
             upvote.setColorFilter(GRAY);
+            alert.setNumber_of_votes(numberOfVotes);
             alertVotes.setText(String.valueOf(numberOfVotes));
         } else if (downvote.getColorFilter().equals(RED)) {
             downvote.setColorFilter(GRAY);
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString());
             alertVotes.setText(String.valueOf(++numberOfVotes));
-            deleteVote();
         }
     }
 
@@ -129,7 +113,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final View mView;
         private final TextView titleView;
         private final TextView typeView;
         private final TextView rangeView;
@@ -140,7 +123,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
         public ViewHolder(View view) {
             super(view);
-            mView = view;
             materialCardView = view.findViewById(R.id.material_card);
             titleView = view.findViewById(R.id.titleTextView);
             typeView = view.findViewById(R.id.typeTextView);

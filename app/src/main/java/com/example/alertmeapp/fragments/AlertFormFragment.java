@@ -45,7 +45,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
-import com.example.alertmeapp.logedInUser.LoggedInUser;
+import com.example.alertmeapp.loggedInUser.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
