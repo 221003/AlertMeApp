@@ -1,21 +1,21 @@
 package com.example.alertmeapp.api.serverResponse;
 
-import com.example.alertmeapp.api.serverRequest.AlertBody;
+import com.example.alertmeapp.api.serverRequest.AlertFullBody;
 import com.google.gson.annotations.SerializedName;
 
 public class AlertResponse {
     @SerializedName("data")
-    private AlertBody alert;
+    private AlertFullBody alertFullBody;
 
-    public AlertResponse(AlertBody alert) {
-        this.alert = alert;
+    public AlertResponse(AlertFullBody alertFullBody) {
+        this.alertFullBody = alertFullBody;
     }
 
-    public AlertBody getAlert() {
-        return alert;
+    public AlertFullBody getAlertFullBody() {
+        return alertFullBody;
     }
 
-    public void setAllAlert(AlertBody alert) {
-        this.alert = alert;
+    public void setAlertFullBody(AlertFullBody alertFullBody) {
+        this.alertFullBody = alertFullBody;
     }
 }
