@@ -21,4 +21,9 @@
     <fragment
         android:id="@+id/alertFormFragment"
         android:name="com.example.alertmeapp.fragments.AlertFormFragment" />
+    <fragment
+        android:id="@+id/alertDetailsFragment"
+        android:name="com.example.alertmeapp.fragments.AlertDetailsFragment"
+        android:label="fragment_alert_details"
+        tools:layout="@layout/fragment_alert_details" />
 </navigation>
