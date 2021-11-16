@@ -36,7 +36,7 @@ public class AlertContent {
                 if (response.isSuccessful()) {
                     List<AlertBody> allAlert = response.body().getAllAlert();
                     allAlert.stream().forEach(alert -> {
-                        alertItems.add(new AlertItem(alert.getAlertType().getName(), alert.getTitle(), countDistance(alert.getLongitude(), alert.getLatitude())));
+                        alertItems.add(new AlertItem(alert.getId(), alert.getAlertType().getName(), alert.getTitle(), countDistance(alert.getLongitude(), alert.getLatitude())));
                     });
                     recyclerView.setAdapter(new MyListRecyclerViewAdapter(alertItems));
                 } else {
@@ -72,12 +72,18 @@ public class AlertContent {
         return res;
     }
 
+    public AlertItem getItem(int i) {
+        return alertItems.get(i);
+    }
+
     public static class AlertItem {
+        public final Long id;
         public final String alertType;
         public final String title;
         public final String distance;
 
-        public AlertItem(String alertType, String title, String distance) {
+        public AlertItem(Long id, String alertType, String title, String distance) {
+            this.id = id;
             this.alertType = alertType;
             this.title = title;
             this.distance = distance;
@@ -86,7 +92,8 @@ public class AlertContent {
         @Override
         public String toString() {
             return "AlertItem{" +
-                    "alertType='" + alertType + '\'' +
+                    "id=" + id +
+                    ", alertType='" + alertType + '\'' +
                     ", title='" + title + '\'' +
                     ", distance='" + distance + '\'' +
                     '}';
