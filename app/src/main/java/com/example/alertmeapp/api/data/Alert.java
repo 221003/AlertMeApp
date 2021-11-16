@@ -109,6 +109,15 @@ public class Alert {
         this.user = user;
     }
 
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "Alert{" +
@@ -121,6 +130,7 @@ public class Alert {
                 ", expire_date='" + expire_date + '\'' +
                 ", alertType=" + alertType +
                 ", user=" + user +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

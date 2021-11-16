@@ -14,9 +14,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.data.Alert;
+import com.example.alertmeapp.api.data.Vote;
+import com.example.alertmeapp.api.requests.AlertRequest;
+import com.example.alertmeapp.api.requests.VoteRequest;
+import com.example.alertmeapp.api.responses.ResponseSingleData;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.google.android.material.card.MaterialCardView;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
@@ -25,6 +38,8 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     private final PorterDuffColorFilter GREEN = new PorterDuffColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
     private final PorterDuffColorFilter RED = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     private final PorterDuffColorFilter GRAY = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+    private final AlertMeService service = RestAdapter.getAlertMeService();
+    private final long USER_ID = 1L;
 
 
     public MyListRecyclerViewAdapter(List<AlertItem> items) {
@@ -52,6 +67,8 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.materialCardView.setStrokeColor(color);
         holder.upvote.setColorFilter(GRAY);
         holder.downvote.setColorFilter(GRAY);
+        findVote(new VoteRequest(alert.getId(), USER_ID), holder);
+
         holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
         holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
     }
@@ -75,6 +92,32 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         return color;
     }
 
+    private void updateAlert(Alert alert) {
+        AlertRequest alertRequest = new AlertRequest.Builder()
+                .withAlertTypeId(alert.getAlertType().getId())
+                .withDescription(alert.getDescription())
+                .withLatitude(alert.getLatitude())
+                .withLongitude(alert.getLongitude())
+                .withImage(alert.getImage())
+                .withTitle(alert.getTitle())
+                .withNumberOfVotes(alert.getNumber_of_votes())
+                .withUserId(alert.getUser().getId())
+                .build();
+        System.out.println(alertRequest);
+        Call<ResponseSingleData<Alert>> call = service.updateAlert(alertRequest, alert.getId());
+        call.enqueue(new Callback<ResponseSingleData<Alert>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
+                System.out.println("REQUEST OK");
+                System.out.println(response.code());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
+            }
+        });
+    }
+
     private void handleUpVote(ImageView upvote, ImageView downvote, TextView alertVotes, Alert alert) {
         if (upvote.getColorFilter().equals(GRAY)) {
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString()) + 1;
@@ -82,13 +125,63 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 numberOfVotes++;
             upvote.setColorFilter(GREEN);
             downvote.setColorFilter(GRAY);
-            alert.setNumber_of_votes(numberOfVotes);
             alertVotes.setText(String.valueOf(numberOfVotes));
+            alert.setNumber_of_votes(numberOfVotes);
+            updateAlert(alert);
+            createVote(new VoteRequest(alert.getId(), USER_ID, true));
         } else if (upvote.getColorFilter().equals(GREEN)) {
             upvote.setColorFilter(GRAY);
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString());
             alertVotes.setText(String.valueOf(--numberOfVotes));
+            alert.setNumber_of_votes(numberOfVotes);
+            updateAlert(alert);
+            findAndDeleteVote(new VoteRequest(alert.getId(), USER_ID));
         }
+    }
+
+    private void createVote(VoteRequest voteRequest) {
+        Call<ResponseSingleData<Vote>> call = service.createVote(voteRequest);
+        System.out.println(voteRequest);
+        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
+                System.out.println("REQUEST CODE");
+                System.out.println(response.code());
+                if (!response.isSuccessful()) {
+                    Gson gson = new Gson();
+                    try {
+                        ResponseSingleData errorResponse = gson.fromJson(
+                                response.errorBody().string(),
+                                ResponseSingleData.class);
+                        int existingId = errorResponse.getErrorCode();
+                        updateVote(voteRequest, (long) existingId);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void updateVote(VoteRequest voteRequest, Long id) {
+        Call<ResponseSingleData<Vote>> call = service.updateVote(voteRequest, id);
+        System.out.println(voteRequest);
+        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
+                System.out.println("REQUEST CODE");
+                System.out.println(response.code());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
+            }
+        });
     }
 
     private void handleDownVote(ImageView upvote, ImageView downvote, TextView alertVotes, Alert alert) {
@@ -98,13 +191,78 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 numberOfVotes--;
             downvote.setColorFilter(RED);
             upvote.setColorFilter(GRAY);
-            alert.setNumber_of_votes(numberOfVotes);
             alertVotes.setText(String.valueOf(numberOfVotes));
+            alert.setNumber_of_votes(numberOfVotes);
+            updateAlert(alert);
+            createVote(new VoteRequest(alert.getId(), USER_ID, false));
         } else if (downvote.getColorFilter().equals(RED)) {
             downvote.setColorFilter(GRAY);
             int numberOfVotes = Integer.parseInt(alertVotes.getText().toString());
             alertVotes.setText(String.valueOf(++numberOfVotes));
+            alert.setNumber_of_votes(numberOfVotes);
+            updateAlert(alert);
+            findAndDeleteVote(new VoteRequest(alert.getId(), USER_ID, false));
         }
+    }
+
+    private void findVote(VoteRequest voteRequest, ViewHolder holder){
+        Call<ResponseSingleData<Vote>> call = service.findVote(voteRequest);
+        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
+                System.out.println("FIND VOTE CODE");
+                System.out.println(response.code());
+                if(response.body()!=null)
+                    System.out.println("is upped" + response.body());
+                if (response.body()==null){
+                    holder.upvote.setColorFilter(GRAY);
+                    holder.downvote.setColorFilter(GRAY);
+                }
+                else if(response.body().getData().isUpped())
+                    holder.upvote.setColorFilter(GREEN);
+                else if(!response.body().getData().isUpped())
+                    holder.downvote.setColorFilter(RED);
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void deleteVote(Long voteId) {
+        Call<ResponseBody> call = service.deleteVote(voteId);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                System.out.println("DELETE VOTE CODE");
+                System.out.println(response.code());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            }
+        });
+    }
+
+    private void findAndDeleteVote(VoteRequest voteRequest) {
+
+        Call<ResponseSingleData<Vote>> call = service.findVote(voteRequest);
+        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
+                System.out.println("FIND VOTE CODE");
+                System.out.println(response.code());
+                System.out.println(response.body());
+                deleteVote(response.body().getData().getId());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
+            }
+        });
+
     }
 
     @Override

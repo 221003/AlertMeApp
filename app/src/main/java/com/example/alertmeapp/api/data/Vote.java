@@ -1,10 +1,13 @@
 package com.example.alertmeapp.api.data;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Vote {
 
     private Long id;
     private Alert alert;
     private User user;
+    @SerializedName("upped")
     private boolean isUpped;
 
     public Long getId() {

@@ -156,6 +156,7 @@ public class SignInActivity extends AppCompatActivity {
                                 .removeLocationUpdates(this);
 
                         Call<ResponseSingleData<User>> call = service.signIn(new UserSignInRequest(email, password));
+                        System.out.println(new UserSignInRequest(email, password));
                         call.enqueue(new Callback<ResponseSingleData<User>>() {
                             @Override
                             public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
@@ -165,6 +166,8 @@ public class SignInActivity extends AppCompatActivity {
                                     changeActivityTo(MainActivity.class);
                                 } else {
                                     try {
+                                        System.out.println(response.code());
+                                        System.out.println(response.errorBody());
                                         Gson gson = new Gson();
                                         ResponseSingleData errorResponse = gson.fromJson(
                                                 response.errorBody().string(),
