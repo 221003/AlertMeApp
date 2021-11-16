@@ -6,7 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -78,7 +82,10 @@ public class ListFragment extends Fragment {
             recyclerView.addOnItemTouchListener(
                     new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                         @Override public void onItemClick(View view, int position) {
-                            navigateToAlertDetails(alertContent.getItem(position).id);
+                            Bundle bundle = new Bundle();
+                            bundle.putLong("alertId", alertContent.getItem(position).id);
+                            NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                            navController.navigate(R.id.alertDetailsFragment, bundle);
                         }
 
                         @Override public void onLongItemClick(View view, int position) {}
@@ -86,26 +93,5 @@ public class ListFragment extends Fragment {
             );
         }
         return view;
-    }
-
-    public void navigateToAlertDetails(Long alertId) {
-        AlertMeService service = RestAdapter.getAlertMeService();
-        Call<AlertResponse> alert = service.getAlert(alertId);
-        alert.enqueue(new Callback<AlertResponse>() {
-            @Override
-            public void onResponse(Call<AlertResponse> call, Response<AlertResponse> response) {
-                if (response.isSuccessful()) {
-                    AlertBody alertBody = response.body().getAlert();
-                    //TODO navigate to fragment
-                } else {
-                    System.out.println("Unsuccessful to fetch alert");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AlertResponse> call, Throwable t) {
-                System.out.println("Failed to fetch alert");
-            }
-        });
     }
 }

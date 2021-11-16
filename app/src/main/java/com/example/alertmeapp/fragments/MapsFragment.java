@@ -1,18 +1,19 @@
 package com.example.alertmeapp.fragments;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.AlertMeService;
@@ -76,11 +77,17 @@ public class MapsFragment extends Fragment {
             getAlerts();
             googleMap.setOnMarkerClickListener(marker -> {
                 marker.showInfoWindow();
-                Optional<JsonElement> alert = markersAssociatedWithAlerts.entrySet().stream()
+                Optional<JsonElement> alertElement = markersAssociatedWithAlerts.entrySet().stream()
                         .filter(e -> e.getKey().equals(marker))
                         .map(Map.Entry::getValue)
                         .findFirst();
-                //TODO Display detail information about an alert
+
+                JsonObject alert = (JsonObject) alertElement.get();
+                Bundle bundle = new Bundle();
+                bundle.putLong("alertId", alert.get("id").getAsLong());
+                NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                navController.navigate(R.id.alertDetailsFragment, bundle);
+
                 return true;
             });
         }
