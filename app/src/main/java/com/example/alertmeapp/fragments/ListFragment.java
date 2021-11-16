@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.dummy.AlertContent;
 import com.example.alertmeapp.dummy.MyListRecyclerViewAdapter;
+import com.example.alertmeapp.dummy.RecyclerItemClickListener;
 
 import java.util.List;
 
@@ -69,6 +70,16 @@ public class ListFragment extends Fragment {
             }
             //initialize list with items and sets adapter
             AlertContent alertContent = new AlertContent(recyclerView);
+
+            recyclerView.addOnItemTouchListener(
+                    new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override public void onItemClick(View view, int position) {
+                            System.out.println(alertContent.getItem(position));
+                        }
+
+                        @Override public void onLongItemClick(View view, int position) {}
+                    })
+            );
         }
         return view;
     }
