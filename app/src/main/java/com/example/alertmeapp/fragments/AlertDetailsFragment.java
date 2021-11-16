@@ -1,18 +1,25 @@
 package com.example.alertmeapp.fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.AlertMeService;
 import com.example.alertmeapp.api.RestAdapter;
 import com.example.alertmeapp.api.serverRequest.AlertFullBody;
 import com.example.alertmeapp.api.serverResponse.AlertResponse;
+
+import java.util.Base64;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +44,12 @@ public class AlertDetailsFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        ImageView imageView = getView().findViewById(R.id.details_close);
+        imageView.setOnClickListener((event) -> {
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.popBackStack();
+        });
+
         Bundle args = getArguments();
         long alertId = args.getLong("alertId");
         AlertMeService service = RestAdapter.getAlertMeService();
@@ -45,7 +58,7 @@ public class AlertDetailsFragment extends Fragment {
             @Override
             public void onResponse(Call<AlertResponse> call, Response<AlertResponse> response) {
                 if (response.isSuccessful()) {
-                    AlertFullBody alertFullBody = response.body().getAlertFullBody();
+                    populateFragmentView(response.body().getAlertFullBody());
                 } else {
                     System.out.println("Unsuccessful to fetch alert");
                 }
@@ -56,5 +69,15 @@ public class AlertDetailsFragment extends Fragment {
                 System.out.println("Failed to fetch alert");
             }
         });
+    }
+
+    private void populateFragmentView(AlertFullBody alertFullBody) {
+        ImageView imageView = getView().findViewById(R.id.details_image);
+        imageView.setImageBitmap(getImageBitmap(alertFullBody.getImage()));
+    }
+
+    private Bitmap getImageBitmap(String image) {
+        byte[] decodedImage = Base64.getDecoder().decode(image);
+        return BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
     }
 }
