@@ -2,22 +2,26 @@ package com.example.alertmeapp.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.example.alertmeapp.R;
+import com.example.alertmeapp.api.AlertMeService;
+import com.example.alertmeapp.api.RestAdapter;
+import com.example.alertmeapp.api.serverRequest.AlertBody;
+import com.example.alertmeapp.api.serverResponse.AlertResponse;
 import com.example.alertmeapp.dummy.AlertContent;
-import com.example.alertmeapp.dummy.MyListRecyclerViewAdapter;
 import com.example.alertmeapp.dummy.RecyclerItemClickListener;
 
-import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -74,7 +78,7 @@ public class ListFragment extends Fragment {
             recyclerView.addOnItemTouchListener(
                     new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                         @Override public void onItemClick(View view, int position) {
-                            System.out.println(alertContent.getItem(position));
+                            navigateToAlertDetails(alertContent.getItem(position).id);
                         }
 
                         @Override public void onLongItemClick(View view, int position) {}
@@ -84,4 +88,24 @@ public class ListFragment extends Fragment {
         return view;
     }
 
+    public void navigateToAlertDetails(Long alertId) {
+        AlertMeService service = RestAdapter.getAlertMeService();
+        Call<AlertResponse> alert = service.getAlert(alertId);
+        alert.enqueue(new Callback<AlertResponse>() {
+            @Override
+            public void onResponse(Call<AlertResponse> call, Response<AlertResponse> response) {
+                if (response.isSuccessful()) {
+                    AlertBody alertBody = response.body().getAlert();
+                    //TODO navigate to fragment
+                } else {
+                    System.out.println("Unsuccessful to fetch alert");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AlertResponse> call, Throwable t) {
+                System.out.println("Failed to fetch alert");
+            }
+        });
+    }
 }
