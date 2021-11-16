@@ -116,6 +116,26 @@
                     android:textSize="20sp"/>
             </LinearLayout>
 
+            <!--                    Distance to                       -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/details_distance_to" />
+
+                <TextView
+                    android:id="@+id/details_distance_to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/dark_grey"
+                    android:textSize="20sp"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
