@@ -1,12 +1,8 @@
 package com.example.alertmeapp.fragments.alert.list;
 
-import android.content.Context;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,21 +14,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.utils.DistanceComparator;
-import com.example.alertmeapp.utils.LoggedInUser;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import okio.AsyncTimeout;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -126,7 +116,7 @@ public class ListFragment extends Fragment {
                 }
                 ArrayAdapter<String> adapter = null;
                 try {
-                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
+                    adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_list, categories);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -137,7 +127,7 @@ public class ListFragment extends Fragment {
             public void onFailure(Call<ResponseMultipleData<AlertType>> call, Throwable t) {
                 ArrayAdapter<String> adapter = null;
                 try {
-                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, new String[0]);
+                    adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_list, new String[0]);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
