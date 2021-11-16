@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -71,9 +72,13 @@ public class AlertDetailsFragment extends Fragment {
         });
     }
 
-    private void populateFragmentView(AlertFullBody alertFullBody) {
+    private void populateFragmentView(AlertFullBody alert) {
         ImageView imageView = getView().findViewById(R.id.details_image);
-        imageView.setImageBitmap(getImageBitmap(alertFullBody.getImage()));
+        imageView.setImageBitmap(getImageBitmap(alert.getImage()));
+
+        TextView titleView = getView().findViewById(R.id.details_title);
+
+        titleView.setText(alert.getTitle());
     }
 
     private Bitmap getImageBitmap(String image) {
