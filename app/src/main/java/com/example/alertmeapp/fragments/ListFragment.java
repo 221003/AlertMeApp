@@ -2,21 +2,30 @@ package com.example.alertmeapp.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.alertmeapp.R;
-import com.example.alertmeapp.dummy.AlertContent;
-import com.example.alertmeapp.dummy.MyListRecyclerViewAdapter;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import com.example.alertmeapp.R;
+import com.example.alertmeapp.api.AlertMeService;
+import com.example.alertmeapp.api.RestAdapter;
+import com.example.alertmeapp.api.serverRequest.AlertBody;
+import com.example.alertmeapp.api.serverResponse.AlertResponse;
+import com.example.alertmeapp.dummy.AlertContent;
+import com.example.alertmeapp.dummy.RecyclerItemClickListener;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -69,8 +78,20 @@ public class ListFragment extends Fragment {
             }
             //initialize list with items and sets adapter
             AlertContent alertContent = new AlertContent(recyclerView);
+
+            recyclerView.addOnItemTouchListener(
+                    new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override public void onItemClick(View view, int position) {
+                            Bundle bundle = new Bundle();
+                            bundle.putLong("alertId", alertContent.getItem(position).id);
+                            NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                            navController.navigate(R.id.alertDetailsFragment, bundle);
+                        }
+
+                        @Override public void onLongItemClick(View view, int position) {}
+                    })
+            );
         }
         return view;
     }
-
 }

@@ -3,6 +3,7 @@ package com.example.alertmeapp.api;
 import com.example.alertmeapp.api.serverRequest.NewAlertBody;
 import com.example.alertmeapp.api.serverRequest.LoginBody;
 import com.example.alertmeapp.api.serverRequest.SignUpBody;
+import com.example.alertmeapp.api.serverResponse.AlertResponse;
 import com.example.alertmeapp.api.serverResponse.AlertTypeResponse;
 import com.example.alertmeapp.api.serverResponse.AllAlertsResponse;
 import com.example.alertmeapp.api.serverResponse.ServeLogInResponse;
@@ -12,6 +13,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface AlertMeService {
     @POST("api/users/login")
@@ -32,4 +34,6 @@ public interface AlertMeService {
     @GET("/api/alerts")
     Call<ResponseBody> getAlerts();
 
+    @GET("/api/alerts/{id}")
+    Call<AlertResponse> getAlert(@Path("id") Long id);
 }

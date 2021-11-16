@@ -40,4 +40,11 @@
     <string name="description">Description</string>
     <string name="type">Type</string>
     <string name="range">Range</string>
+    <string name="details_title">Title</string>
+    <string name="details_type">Type</string>
+    <string name="details_author">Author</string>
+    <string name="details_location">Location</string>
+    <string name="details_distance_to">Distance to</string>
+    <string name="details_votes">Votes</string>
+    <string name="details_description">Description</string>
 </resources>
