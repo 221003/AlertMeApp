@@ -95,6 +95,8 @@ public class AlertDetailsFragment extends Fragment {
         TextView alertTypeView = getView().findViewById(R.id.details_alert_type);
         TextView authorView = getView().findViewById(R.id.details_author);
         TextView locationView = getView().findViewById(R.id.details_location);
+        TextView numberOfVotesView = getView().findViewById(R.id.details_votes);
+        TextView descriptionView = getView().findViewById(R.id.details_description);
 
         imageView.setImageBitmap(getImageBitmap(alert.getImage()));
 
@@ -110,6 +112,10 @@ public class AlertDetailsFragment extends Fragment {
         locationView.setText(getAlertAddress(alert.getLatitude(), alert.getLongitude()));
 
         setDistanceTo(alert.getLatitude(), alert.getLongitude());
+
+        numberOfVotesView.setText(String.valueOf(alert.getNumber_of_votes()));
+
+        descriptionView.setText(alert.getDescription());
     }
 
     private Bitmap getImageBitmap(String image) {
