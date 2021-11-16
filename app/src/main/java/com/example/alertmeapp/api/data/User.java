@@ -1,26 +1,26 @@
-package com.example.alertmeapp.api.serverRequest;
+package com.example.alertmeapp.api.data;
 
 import com.google.gson.annotations.SerializedName;
 
 public class User {
 
-    private Integer id;
+    private Long id;
     @SerializedName("first_name")
     private String fistName;
     @SerializedName("last_name")
     private String lastName;
 
-    public User(Integer id, String fistName, String lastName) {
+    public User(Long id, String fistName, String lastName) {
         this.id = id;
         this.fistName = fistName;
         this.lastName = lastName;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -38,5 +38,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", fistName='" + fistName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
     }
 }

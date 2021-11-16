@@ -1,12 +1,12 @@
 package com.example.alertmeapp.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -22,17 +22,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.serverRequest.LoginBody;
-import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.api.serverResponse.ServeLogInResponse;
-import com.example.alertmeapp.logedInUser.LoggedInUser;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.data.User;
+import com.example.alertmeapp.api.requests.UserSignInRequest;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.responses.ResponseSingleData;
+import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 
 
 import java.io.IOException;
@@ -63,8 +66,6 @@ public class SignInActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
     private static final int REQUEST_LOCATION_CODE = 103;
-    private String latitude;
-    private String longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,67 +140,58 @@ public class SignInActivity extends AppCompatActivity {
 
     private void requestToSignInUser(String email, String password,
                                      TextView emailInvalidElement, TextView passwordInvalidElement) {
-        getLastLocation();
-        Call<ServeLogInResponse> call = service.signIn(new LoginBody(email, password));
-        call.enqueue(new Callback<ServeLogInResponse>() {
-            @Override
-            public void onResponse(Call<ServeLogInResponse> call, Response<ServeLogInResponse> response) {
-                if (response.isSuccessful()) {
-                    LoggedInUser.getInstance(response.body().getUser(), longitude, latitude);
-                    changeActivityTo(MainActivity.class);
-                } else {
-                    try {
-                        String json = response.errorBody().string();
-                        JsonParser jsonParser = new JsonParser();
-                        JsonObject root = jsonParser.parse(json).getAsJsonObject();
-                        int errorCode = root.get("errorCode").getAsInt();
-                        String errorMessage = root.get("error").getAsString();
-                        if (errorCode == INCORRECT_LOGIN_CODE)
-                            emailInvalidElement.setText(errorMessage);
-                        else if (errorCode == INCORRECT_PASSWORD_CODE)
-                            passwordInvalidElement.setText(errorMessage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        displayToast();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ServeLogInResponse> call, Throwable t) {
-                displayToast();
-            }
-        });
-
-    }
-
-    public void getLastLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
         }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener( this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    latitude = String.valueOf(location.getLatitude());
-                                    longitude = String.valueOf(location.getLongitude());
+        LocationServices.getFusedLocationProviderClient(getApplicationContext())
+                .requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult locationResult) {
+                        LocationServices.getFusedLocationProviderClient(getApplicationContext())
+                                .removeLocationUpdates(this);
 
+                        Call<ResponseSingleData<User>> call = service.signIn(new UserSignInRequest(email, password));
+                        System.out.println(new UserSignInRequest(email, password));
+                        call.enqueue(new Callback<ResponseSingleData<User>>() {
+                            @Override
+                            public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
+                                if (response.isSuccessful()) {
+                                    LoggedInUser.getInstance(response.body().getData(), locationResult.getLastLocation().getLongitude(),
+                                            locationResult.getLastLocation().getLatitude());
+                                    changeActivityTo(MainActivity.class);
                                 } else {
-                                    latitude = "52.237049";
-                                    longitude = "21.017532";
+                                    try {
+                                        System.out.println(response.code());
+                                        System.out.println(response.errorBody());
+                                        Gson gson = new Gson();
+                                        ResponseSingleData errorResponse = gson.fromJson(
+                                                response.errorBody().string(),
+                                                ResponseSingleData.class);
+                                        int errorCode = errorResponse.getErrorCode();
+                                        String errorMessage = errorResponse.getError();
+                                        if (errorCode == INCORRECT_LOGIN_CODE)
+                                            emailInvalidElement.setText(errorMessage);
+                                        else if (errorCode == INCORRECT_PASSWORD_CODE)
+                                            passwordInvalidElement.setText(errorMessage);
+                                    } catch (IOException e) {
+                                        displayToast();
+                                    }
+
                                 }
                             }
-                        }
-                ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                latitude = "52.237049";
-                longitude = "21.017532";
-            }
-        });
+
+                            @Override
+                            public void onFailure(Call<ResponseSingleData<User>> call, Throwable t) {
+                                displayToast();
+                            }
+                        });
+                    }
+                }, Looper.getMainLooper());
     }
 
     private boolean validateEmail(String email) {

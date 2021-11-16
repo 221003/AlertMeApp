@@ -40,20 +40,18 @@ import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.activities.MapsActivity;
-import com.example.alertmeapp.api.serverRequest.NewAlertBody;
-import com.example.alertmeapp.api.serverRequest.AlertBody;
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.serverRequest.AlertType;
-import com.example.alertmeapp.api.serverResponse.AlertTypeResponse;
-import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.logedInUser.LoggedInUser;
+import com.example.alertmeapp.api.requests.AlertRequest;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.data.AlertType;
+import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -102,11 +100,10 @@ public class AlertFormFragment extends Fragment {
             new ActivityResultContracts.StartActivityForResult(),
             result -> processChosenPhoto(result));
 
-    private Location lastLocation;
     private Double longitude;
     private Double latitude;
     private final AlertMeService service = RestAdapter.getAlertMeService();
-    private List<AlertType> alertTypes = new ArrayList<>();
+    private List<AlertType> alertTypeRequests = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -123,7 +120,6 @@ public class AlertFormFragment extends Fragment {
         buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
         buttonLocalization.setOnClickListener(this::onChooseLocalization);
 
-        getLastLocation();
         categorySpinner = view.findViewById(R.id.alert_form_category);
         populateCategorySpinner();
 
@@ -163,13 +159,13 @@ public class AlertFormFragment extends Fragment {
     private void populateCategorySpinner() {
         List<String> categories = new ArrayList<>(5);
 
-        Call<AlertTypeResponse> allAlertTypes = service.getAllAlertTypes();
-        allAlertTypes.enqueue(new Callback<AlertTypeResponse>() {
+        Call<ResponseMultipleData<AlertType>> allAlertTypes = service.getAllAlertTypes();
+        allAlertTypes.enqueue(new Callback<ResponseMultipleData<AlertType>>() {
             @Override
-            public void onResponse(Call<AlertTypeResponse> call, Response<AlertTypeResponse> response) {
-                for (AlertType alertType : response.body().getAllAlertTypes()) {
-                    categories.add(alertType.getName());
-                    alertTypes.add(alertType);
+            public void onResponse(Call<ResponseMultipleData<AlertType>> call, Response<ResponseMultipleData<AlertType>> response) {
+                for (AlertType alertTypeRequest : response.body().getData()) {
+                    categories.add(alertTypeRequest.getName());
+                    alertTypeRequests.add(alertTypeRequest);
                 }
                 ArrayAdapter<String> adapter = null;
                 try {
@@ -181,7 +177,7 @@ public class AlertFormFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<AlertTypeResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseMultipleData<AlertType>> call, Throwable t) {
                 displayToast("Error occurred");
                 ArrayAdapter<String> adapter = null;
                 try {
@@ -221,13 +217,24 @@ public class AlertFormFragment extends Fragment {
         }
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
-            requestToSaveAlert(new NewAlertBody(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
+            AlertRequest alertRequest = new AlertRequest.Builder()
+                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
+                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
+                    .withDescription(description)
+                    .withTitle(title)
+                    .withLatitude(latitude)
+                    .withLongitude(longitude)
+                    .withNumberOfVotes(0)
+                    .withImage(getUploadedPhotoBytesArray())
+                    .build();
+            requestToSaveAlert(alertRequest);
+//            requestToSaveAlert(new AlertRequest(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
+//                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
         }
     }
 
-    private void requestToSaveAlert(NewAlertBody newAlertBody) {
-        Call<ResponseBody> responseBodyCall = service.saveNewAlert(newAlertBody);
+    private void requestToSaveAlert(AlertRequest alertRequest) {
+        Call<ResponseBody> responseBodyCall = service.saveNewAlert(alertRequest);
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -347,38 +354,10 @@ public class AlertFormFragment extends Fragment {
         return !description.isEmpty();
     }
 
-    public void getLastLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(PERMISSIONS_LOCALIZATION, REQUEST_LOCATION_CODE);
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    lastLocation = location;
-                                } else {
-                                    lastLocation = new Location("");
-                                    lastLocation.setLatitude(52.237049);
-                                    lastLocation.setLongitude(21.017532);
-                                }
-                            }
-                        }
-                ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                lastLocation = new Location("");
-                lastLocation.setLatitude(52.237049);
-                lastLocation.setLongitude(21.017532);
-            }
-        });
-    }
-
     public void onChooseLocalization(View view) {
         Intent i = new Intent(getActivity(), MapsActivity.class);
-        i.putExtra("longitude", lastLocation.getLongitude());
-        i.putExtra("latitude", lastLocation.getLatitude());
+        i.putExtra("longitude", LoggedInUser.getLoggedUser().getLastLongitude());
+        i.putExtra("latitude", LoggedInUser.getLoggedUser().getLastLatitude());
         startActivity(i);
     }
 
@@ -395,8 +374,8 @@ public class AlertFormFragment extends Fragment {
     }
 
     private AlertType getSelectedCategoryAlertType(String category) {
-        AlertType selectedCategory = alertTypes.stream()
-                .filter(alertType -> alertType.getName() == category)
+        AlertType selectedCategory = alertTypeRequests.stream()
+                .filter(alertTypeRequest -> alertTypeRequest.getName() == category)
                 .findFirst()
                 .get();
         return selectedCategory;

@@ -13,17 +13,17 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.AlertMeService;
-import com.example.alertmeapp.api.RestAdapter;
-import com.example.alertmeapp.api.serverRequest.SignUpBody;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.api.data.User;
+import com.example.alertmeapp.api.requests.UserSignUpRequest;
+import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,16 +57,16 @@ public class SignUpActivity extends AppCompatActivity {
             //TODO handle returned JSON message from server -> display message
             if(handleInputErrors()){
                 AlertMeService service = RestAdapter.getAlertMeService();
-                SignUpBody signUpBody = createSignUpBody();
-                Call<ResponseBody> call = service.signUp(signUpBody);
-                call.enqueue(new Callback<ResponseBody>() {
+                UserSignUpRequest userSignUpRequest = createSignUpBody();
+                Call<ResponseSingleData<User>> call = service.signUp(userSignUpRequest);
+                call.enqueue(new Callback<ResponseSingleData<User>>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
                         if(response.isSuccessful())
                             changeActivityTo(MainActivity.class);
                     }
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    public void onFailure(Call<ResponseSingleData<User>> call, Throwable t) {
                         displayToast("Error occurred");
                     }
                 });
@@ -74,12 +74,12 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    private SignUpBody createSignUpBody() {
+    private UserSignUpRequest createSignUpBody() {
         String email = tilEmail.getEditText().getText().toString();
         String firstName = tilFirstName.getEditText().getText().toString();
         String lastName = tilLastName.getEditText().getText().toString();
         String password = tilPassword.getEditText().getText().toString();
-        return new SignUpBody(email, firstName, lastName, "", password);
+        return new UserSignUpRequest(email, firstName, lastName, "", password);
     }
 
 

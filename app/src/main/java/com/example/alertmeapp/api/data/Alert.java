@@ -1,46 +1,48 @@
-package com.example.alertmeapp.api.serverRequest;
+package com.example.alertmeapp.api.data;
 
-import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
+public class Alert {
 
-public class NewAlertBody {
-    private Long userId;
-    private Long alertTypeId;
-    private String title;
-    private String description;
-    private int number_of_votes;
-    private double latitude;
-    private double longitude;
-    private String expire_date;
-    private String image;
+    protected Long id;
+    protected String title;
+    protected String description;
+    protected int number_of_votes;
+    protected double latitude;
+    protected double longitude;
+    protected String expire_date;
+    private AlertType alertType;
+    private User user;
+    protected String image;
 
-    public NewAlertBody(Long userId, Long alertTypeId, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date, String image) {
-        this.userId = userId;
-        this.alertTypeId = alertTypeId;
+    public Alert() {
+    }
+
+    public Alert(Long id, String title, String description, int number_of_votes, double latitude, double longitude, String expire_date, AlertType alertType, User user) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.number_of_votes = number_of_votes;
         this.latitude = latitude;
         this.longitude = longitude;
         this.expire_date = expire_date;
-        this.image = image;
+        this.alertType = alertType;
+        this.user = user;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Alert(String title, String description, int number_of_votes, double latitude, double longitude) {
+        this.title = title;
+        this.description = description;
+        this.number_of_votes = number_of_votes;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public Long getId() {
+        return id;
     }
 
-    public Long getAlertTypeId() {
-        return alertTypeId;
-    }
-
-    public void setAlertTypeId(Long alertTypeId) {
-        this.alertTypeId = alertTypeId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -91,6 +93,23 @@ public class NewAlertBody {
         this.expire_date = expire_date;
     }
 
+    public AlertType getAlertType() {
+        return alertType;
+    }
+
+    public void setAlertType(AlertType alertType) {
+        this.alertType = alertType;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
     public String getImage() {
         return image;
     }
@@ -101,15 +120,16 @@ public class NewAlertBody {
 
     @Override
     public String toString() {
-        return "NewAlertBody{" +
-                "userId=" + userId +
-                ", alertTypeId=" + alertTypeId +
+        return "Alert{" +
+                "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", number_of_votes=" + number_of_votes +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", expire_date='" + expire_date + '\'' +
+                ", alertType=" + alertType +
+                ", user=" + user +
                 ", image='" + image + '\'' +
                 '}';
     }
