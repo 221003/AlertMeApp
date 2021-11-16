@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "309216186293",
+    "project_id": "alertme-2c9df",
+    "storage_bucket": "alertme-2c9df.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309216186293:android:1ab2fb00627e1d426593fc",
+        "android_client_info": {
+          "package_name": "com.example.alertmeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309216186293-uh2q30e7ii8njl3p2u0n9i2nest62omg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC__j-jmCXbJ4sjP-fZUXmDejDfzAjLYKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309216186293-uh2q30e7ii8njl3p2u0n9i2nest62omg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
