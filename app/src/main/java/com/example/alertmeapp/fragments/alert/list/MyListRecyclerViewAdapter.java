@@ -3,6 +3,7 @@ package com.example.alertmeapp.fragments.alert.list;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
@@ -210,7 +213,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         call.enqueue(new Callback<ResponseSingleData<Vote>>() {
             @Override
             public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                System.out.println("FIND VOTE CODE");
+               // System.out.println("FIND VOTE CODE");
                 System.out.println(response.code());
                 if(response.body()!=null)
                     System.out.println("is upped" + response.body());
@@ -236,7 +239,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println("DELETE VOTE CODE");
+               // System.out.println("DELETE VOTE CODE");
                 System.out.println(response.code());
             }
 
@@ -252,9 +255,8 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         call.enqueue(new Callback<ResponseSingleData<Vote>>() {
             @Override
             public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                System.out.println("FIND VOTE CODE");
-                System.out.println(response.code());
-                System.out.println(response.body());
+                //System.out.println("FIND VOTE CODE");
+
                 deleteVote(response.body().getData().getId());
             }
 

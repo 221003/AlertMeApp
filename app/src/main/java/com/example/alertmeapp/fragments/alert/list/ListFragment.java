@@ -1,8 +1,11 @@
 package com.example.alertmeapp.fragments.alert.list;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +21,7 @@ import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.dummy.RecyclerItemClickListener;
 import com.example.alertmeapp.utils.DistanceComparator;
 
 import java.util.ArrayList;
@@ -64,6 +68,7 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        Context context = view.getContext();
         categorySpinner = view.findViewById(R.id.alert_form_category);
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -97,7 +102,24 @@ public class ListFragment extends Fragment {
 
         adapter = new MyListRecyclerViewAdapter(items);
         recyclerView.setAdapter(adapter);
+
         new AlertContent(recyclerView, adapter, items);
+
+
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("alertId",items.get(position).getAlert().getId());
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                        navController.navigate(R.id.alertDetailsFragment, bundle);
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+
+                    }
+                })
+        );
 
 
         return view;

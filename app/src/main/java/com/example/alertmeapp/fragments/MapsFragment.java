@@ -1,10 +1,5 @@
 package com.example.alertmeapp.fragments;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,6 +7,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
@@ -70,7 +72,7 @@ public class MapsFragment extends Fragment {
         public void onMapReady(GoogleMap googleMap) {
             map = googleMap;
             LoggedInUser instance = LoggedInUser.getInstance(null, null, null);
-            System.out.println("Od usera: "+instance.getLastLongitude()+" "+instance.getLastLatitude());
+            System.out.println("Od usera: " + instance.getLastLongitude() + " " + instance.getLastLatitude());
             LatLng latLng = new LatLng(instance.getLastLatitude(), instance.getLastLongitude());
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
             getAlerts();
@@ -80,7 +82,13 @@ public class MapsFragment extends Fragment {
                         .filter(e -> e.getKey().equals(marker))
                         .map(Map.Entry::getValue)
                         .findFirst();
-                //TODO Display detail information about an alert
+
+
+                Bundle bundle = new Bundle();
+                alert.ifPresent(value -> bundle.putLong("alertId", value.getId()));
+                NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                navController.navigate(R.id.alertDetailsFragment, bundle);
+
                 return true;
             });
         }

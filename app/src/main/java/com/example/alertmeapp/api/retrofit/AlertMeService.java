@@ -51,4 +51,7 @@ public interface AlertMeService {
 
     @POST("/api/votes/find")
     Call<ResponseSingleData<Vote>> findVote(@Body VoteRequest voteRequest);
+
+    @GET("/api/alerts/{id}")
+    Call<ResponseSingleData<Alert>> getAlert(@Path("id") Long id);
 }
