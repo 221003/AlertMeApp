@@ -45,7 +45,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
 
     public MyListRecyclerViewAdapter(List<AlertItem> items) {
-        alertList = new LinkedList(new HashSet(items));
+        this.alertList = items;
     }
 
     @NonNull
@@ -207,22 +207,21 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         }
     }
 
-    private void findVote(VoteRequest voteRequest, ViewHolder holder){
+    private void findVote(VoteRequest voteRequest, ViewHolder holder) {
         Call<ResponseSingleData<Vote>> call = service.findVote(voteRequest);
         call.enqueue(new Callback<ResponseSingleData<Vote>>() {
             @Override
             public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-               // System.out.println("FIND VOTE CODE");
+                // System.out.println("FIND VOTE CODE");
                 System.out.println(response.code());
-                if(response.body()!=null)
+                if (response.body() != null)
                     System.out.println("is upped" + response.body());
-                if (response.body()==null){
+                if (response.body() == null) {
                     holder.upvote.setColorFilter(GRAY);
                     holder.downvote.setColorFilter(GRAY);
-                }
-                else if(response.body().getData().isUpped())
+                } else if (response.body().getData().isUpped())
                     holder.upvote.setColorFilter(GREEN);
-                else if(!response.body().getData().isUpped())
+                else if (!response.body().getData().isUpped())
                     holder.downvote.setColorFilter(RED);
 
             }
@@ -238,8 +237,8 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-               // System.out.println("DELETE VOTE CODE");
-                System.out.println(response.code());
+                // System.out.println("DELETE VOTE CODE");
+//                System.out.println(response.code());
             }
 
             @Override

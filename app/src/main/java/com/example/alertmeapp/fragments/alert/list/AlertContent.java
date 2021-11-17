@@ -14,6 +14,7 @@ import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -22,7 +23,7 @@ import retrofit2.Response;
 
 public class AlertContent {
 
-    private final MyListRecyclerViewAdapter adapter;
+    private MyListRecyclerViewAdapter adapter;
     private final RecyclerView recyclerView;
     private final List<AlertItem> items;
 
@@ -42,9 +43,15 @@ public class AlertContent {
             public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
                 if (response.isSuccessful()) {
                     List<Alert> alerts = response.body().getData();
+                    List<AlertItem> temp = new ArrayList<>();
                     alerts.forEach(alert -> {
-                        items.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
+                        temp.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
                     });
+                    if(items.size()!= temp.size()){
+                        items.clear();
+                        items.addAll(temp);
+                    }
+
                     items.sort(new DistanceComparator());
                     adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
