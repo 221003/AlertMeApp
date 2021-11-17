@@ -3,7 +3,6 @@ package com.example.alertmeapp.fragments.alert.list;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
@@ -27,6 +24,8 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -46,7 +45,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
 
     public MyListRecyclerViewAdapter(List<AlertItem> items) {
-        alertList = items;
+        alertList = new LinkedList(new HashSet(items));
     }
 
     @NonNull

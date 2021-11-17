@@ -27,4 +27,17 @@ public class AlertItem {
     public void setDistance(String distance) {
         this.distance = distance;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof AlertItem)) {
+            return false;
+        }
+        return alert.getId().equals(((AlertItem)other).getAlert().getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return alert.getId().hashCode();
+    }
 }
