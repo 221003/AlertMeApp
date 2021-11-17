@@ -153,7 +153,7 @@ public class AlertDetailsFragment extends Fragment {
                                 current.setLatitude(latitude);
                                 current.setLongitude(longitude);
                                 int distance = (int) location.distanceTo(current);
-                                distanceToView.setText(String.valueOf(distance) + " km");
+                                distanceToView.setText(String.valueOf(distance) + " m");
                             } else {
                                 distanceToView.setText("Unknown");
                             }
