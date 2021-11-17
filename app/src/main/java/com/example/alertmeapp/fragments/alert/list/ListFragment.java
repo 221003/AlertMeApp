@@ -78,7 +78,7 @@ public class ListFragment extends Fragment {
                 if (spinnerFirstTrigger) {
                     String category = categorySpinner.getSelectedItem().toString();
                     System.out.println("wchodze do psinner onitemseleceted");
-                    if (!category.equals("none")) {
+                    if (!category.equals("all")) {
                         List<AlertItem> copyList = new ArrayList<>();
                         for (int i = 0; i < items.size(); i++) {
                             if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
@@ -86,9 +86,9 @@ public class ListFragment extends Fragment {
                             }
                         }
                         copyList.sort(new DistanceComparator());
-                        adapter = new MyListRecyclerViewAdapter(copyList);
+                        adapter = new MyListRecyclerViewAdapter(getActivity(), copyList);
                     } else {
-                        adapter = new MyListRecyclerViewAdapter(items);
+                        adapter = new MyListRecyclerViewAdapter(getActivity(), items);
                     }
                     recyclerView.setAdapter(adapter);
                 } else {
@@ -106,28 +106,28 @@ public class ListFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new MyListRecyclerViewAdapter(items);
+        adapter = new MyListRecyclerViewAdapter(getActivity(), items);
         recyclerView.setAdapter(adapter);
 
         new AlertContent(recyclerView, adapter, items);
 
 
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(context, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("alertId", items.get(position).getAlert().getId());
-                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
-                        navController.navigate(R.id.alertDetailsFragment, bundle);
-                    }
-
-                    @Override
-                    public void onLongItemClick(View view, int position) {
-
-                    }
-                })
-        );
+//        recyclerView.addOnItemTouchListener(
+//                new RecyclerItemClickListener(context, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(View view, int position) {
+//                        Bundle bundle = new Bundle();
+//                        bundle.putLong("alertId", items.get(position).getAlert().getId());
+//                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+//                        navController.navigate(R.id.alertDetailsFragment, bundle);
+//                    }
+//
+//                    @Override
+//                    public void onLongItemClick(View view, int position) {
+//
+//                    }
+//                })
+//        );
 
 
         return view;
@@ -140,7 +140,7 @@ public class ListFragment extends Fragment {
         allAlertTypes.enqueue(new Callback<ResponseMultipleData<AlertType>>() {
             @Override
             public void onResponse(Call<ResponseMultipleData<AlertType>> call, Response<ResponseMultipleData<AlertType>> response) {
-                categories.add("none");
+                categories.add("all");
                 for (AlertType alertTypeRequest : response.body().getData()) {
                     categories.add(alertTypeRequest.getName());
                 }

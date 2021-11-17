@@ -3,6 +3,7 @@ package com.example.alertmeapp.fragments.alert.list;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
@@ -36,6 +40,7 @@ import retrofit2.Response;
 
 public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
 
+    private final FragmentActivity activity;
     private final List<AlertItem> alertList;
     private final PorterDuffColorFilter GREEN = new PorterDuffColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
     private final PorterDuffColorFilter RED = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
@@ -44,8 +49,9 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     private final long USER_ID = 1L;
 
 
-    public MyListRecyclerViewAdapter(List<AlertItem> items) {
+    public MyListRecyclerViewAdapter(FragmentActivity activity, List<AlertItem> items) {
         this.alertList = items;
+        this.activity = activity;
     }
 
     @NonNull
@@ -71,6 +77,15 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.downvote.setColorFilter(GRAY);
         findVote(new VoteRequest(alert.getId(), USER_ID), holder);
 
+        holder.titleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("alertId", alert.getId());
+                NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
+                navController.navigate(R.id.alertDetailsFragment, bundle);
+            }
+        });
         holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
         holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
     }
