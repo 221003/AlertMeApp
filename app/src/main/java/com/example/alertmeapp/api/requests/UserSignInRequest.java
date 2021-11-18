@@ -1,12 +1,18 @@
 package com.example.alertmeapp.api.requests;
 
+import android.content.Context;
+
+import com.example.alertmeapp.notifications.FirebaseMessageReceiver;
+
 public class UserSignInRequest {
     private String login;
     private String password;
+    private String token;
 
-    public UserSignInRequest(String login, String password) {
+    public UserSignInRequest(String login, String password, String token) {
         this.login = login;
         this.password = password;
+        this.token = token;
     }
 
     public String getLogin() {
@@ -23,6 +29,14 @@ public class UserSignInRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override

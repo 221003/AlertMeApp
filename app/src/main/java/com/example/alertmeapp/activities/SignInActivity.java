@@ -27,6 +27,7 @@ import com.example.alertmeapp.api.data.User;
 import com.example.alertmeapp.api.requests.UserSignInRequest;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
+import com.example.alertmeapp.notifications.FirebaseMessageReceiver;
 import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -155,8 +156,8 @@ public class SignInActivity extends AppCompatActivity {
                         LocationServices.getFusedLocationProviderClient(getApplicationContext())
                                 .removeLocationUpdates(this);
 
-                        Call<ResponseSingleData<User>> call = service.signIn(new UserSignInRequest(email, password));
-                        System.out.println(new UserSignInRequest(email, password));
+                        Call<ResponseSingleData<User>> call = service.signIn(new UserSignInRequest(email, password, FirebaseMessageReceiver.getToken(getApplicationContext())));
+                        System.out.println(new UserSignInRequest(email, password, FirebaseMessageReceiver.getToken(getApplicationContext())));
                         call.enqueue(new Callback<ResponseSingleData<User>>() {
                             @Override
                             public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
