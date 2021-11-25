@@ -17,9 +17,6 @@ import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
-import com.example.alertmeapp.fragments.alert.list.AlertContent;
-import com.example.alertmeapp.fragments.alert.list.AlertItem;
-import com.example.alertmeapp.fragments.alert.list.MyListRecyclerViewAdapter;
 import com.example.alertmeapp.utils.DistanceComparator;
 
 import java.util.ArrayList;

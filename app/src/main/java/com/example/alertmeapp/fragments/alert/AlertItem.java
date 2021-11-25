@@ -1,4 +1,4 @@
-package com.example.alertmeapp.fragments.alert.list;
+package com.example.alertmeapp.fragments.alert;
 
 import com.example.alertmeapp.api.data.Alert;
 
