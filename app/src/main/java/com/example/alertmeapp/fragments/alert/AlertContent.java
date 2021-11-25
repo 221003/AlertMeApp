@@ -37,7 +37,7 @@ public class AlertContent {
         AlertMeService service = RestAdapter.getAlertMeService();
         Call<ResponseMultipleData<Alert>> alerts;
         if (myAlerts) {
-            alerts = service.getUserAlerts(2L);
+            alerts = service.getUserAlerts(LoggedInUser.getInstance(null,null,null).getId());
         } else {
             alerts = service.getAllAlerts();
         }
