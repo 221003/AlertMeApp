@@ -16,7 +16,7 @@
         tools:layout="@layout/fragment_item_list" />
     <fragment
         android:id="@+id/myListFragment"
-        android:name="com.example.alertmeapp.fragments.alert.list.MyListFragment"
+        android:name="com.example.alertmeapp.fragments.alert.mylist.MyListFragment"
         android:label="fragment_item_myist"
         tools:layout="@layout/fragment_item_list" />
     <fragment

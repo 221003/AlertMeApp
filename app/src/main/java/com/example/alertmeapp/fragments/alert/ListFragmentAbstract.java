@@ -1,6 +1,5 @@
-package com.example.alertmeapp.fragments.alert.list;
+package com.example.alertmeapp.fragments.alert;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,9 @@ import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.fragments.alert.list.AlertContent;
+import com.example.alertmeapp.fragments.alert.list.AlertItem;
+import com.example.alertmeapp.fragments.alert.list.MyListRecyclerViewAdapter;
 import com.example.alertmeapp.utils.DistanceComparator;
 
 import java.util.ArrayList;
@@ -28,30 +30,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MyListFragment extends Fragment {
+public abstract class ListFragmentAbstract extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    private int mColumnCount = 1;
+    protected static final String ARG_COLUMN_COUNT = "column-count";
+    protected int mColumnCount = 1;
+    protected boolean myAlerts = false;
 
-    private RecyclerView recyclerView;
-    private List<AlertItem> items = new ArrayList<>();
-    private MyListRecyclerViewAdapter adapter;
+    protected RecyclerView recyclerView;
+    protected List<AlertItem> items = new ArrayList<>();
+    protected MyListRecyclerViewAdapter adapter;
 
-    private Spinner categorySpinner;
-    private final AlertMeService service = RestAdapter.getAlertMeService();
-    private boolean spinnerFirstTrigger = false;
+    protected Spinner categorySpinner;
+    protected final AlertMeService service = RestAdapter.getAlertMeService();
+    protected boolean spinnerFirstTrigger = false;
 
-    public MyListFragment() {
+    public ListFragmentAbstract() {
     }
-
-//    @SuppressWarnings("unused")
-//    public static ListFragment newInstance(int columnCount) {
-//        ListFragment fragment = new ListFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_COLUMN_COUNT, columnCount);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,7 +59,6 @@ public class MyListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-        Context context = view.getContext();
         categorySpinner = view.findViewById(R.id.alert_form_category);
         categorySpinner.setSelected(false);
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -105,26 +98,7 @@ public class MyListFragment extends Fragment {
         adapter = new MyListRecyclerViewAdapter(getActivity(), items);
         recyclerView.setAdapter(adapter);
 
-        new AlertContent(recyclerView, adapter, items);
-
-
-//        recyclerView.addOnItemTouchListener(
-//                new RecyclerItemClickListener(context, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(View view, int position) {
-//                        Bundle bundle = new Bundle();
-//                        bundle.putLong("alertId", items.get(position).getAlert().getId());
-//                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
-//                        navController.navigate(R.id.alertDetailsFragment, bundle);
-//                    }
-//
-//                    @Override
-//                    public void onLongItemClick(View view, int position) {
-//
-//                    }
-//                })
-//        );
-
+        new AlertContent(recyclerView, adapter, items, myAlerts);
 
         return view;
     }
