@@ -8,13 +8,13 @@
         />
     <item
         android:id="@+id/listFragment"
-        android:title="List"
+        android:title="Alerts"
         android:icon="@drawable/ic_view_list"
         />
     <item
         android:id="@+id/myListFragment"
-        android:title="My list"
-        android:icon="@drawable/ic_view_list"
+        android:title="My Alerts"
+        android:icon="@drawable/ic_view_mylist"
         />
     <item
         android:id="@+id/alertFormFragment"
