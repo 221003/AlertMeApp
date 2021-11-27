@@ -146,8 +146,8 @@ public class AlertFormFragment extends Fragment {
         //za kazdymr azem a nie po wybraniu
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        this.longitude = Double.valueOf(sharedPref.getFloat("longitude", 51.759f));
-        this.latitude = Double.valueOf(sharedPref.getFloat("latitude", 19.457f));
+        this.longitude = Double.valueOf(sharedPref.getFloat("longitude", 19.457f));
+        this.latitude = Double.valueOf(sharedPref.getFloat("latitude", 51.759f));
 
     }
 
@@ -199,8 +199,8 @@ public class AlertFormFragment extends Fragment {
             String category = categorySpinner.getSelectedItem().toString();
             bundle.putDouble("longitude", longitude);
             bundle.putDouble("latitude", latitude);
-            bundle.putLong("alertTypeId", getSelectedCategoryAlertType(category).getId() == null
-                    ? alertTypeRequests.get(0).getId() : getSelectedCategoryAlertType(category).getId());
+            bundle.putString("alertName", getSelectedCategoryAlertType(category).getName() == null
+                    ? alertTypeRequests.get(0).getName() : getSelectedCategoryAlertType(category).getName());
             NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
             navController.navigate(R.id.duplicateFragment, bundle);
         } else {

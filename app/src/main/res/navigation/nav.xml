@@ -28,7 +28,7 @@
         tools:layout="@layout/fragment_alert_details" />
     <fragment
         android:id="@+id/duplicateFragment"
-        android:name="com.example.alertmeapp.fragments.DuplicateFragment"
+        android:name="com.example.alertmeapp.fragments.duplicate.list.DuplicateFragment"
         android:label="fragment_duplicate_alert"
-        tools:layout="@layout/fragment_duplicate" />
+        tools:layout="@layout/fragment_duplicate_list" />
 </navigation>

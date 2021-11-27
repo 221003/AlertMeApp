@@ -109,7 +109,7 @@ public class ListFragment extends Fragment {
         adapter = new MyListRecyclerViewAdapter(getActivity(), items);
         recyclerView.setAdapter(adapter);
 
-        new AlertContent(recyclerView, adapter, items, null,null,null,null);
+        new AlertContent(recyclerView, adapter, items);
 
 
 //        recyclerView.addOnItemTouchListener(

@@ -1,18 +1,19 @@
-package com.example.alertmeapp.fragments.alert.list;
+package com.example.alertmeapp.fragments.duplicate.list;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.api.retrofit.AlertMeService;
-import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.fragments.alert.list.AlertItem;
+import com.example.alertmeapp.fragments.alert.list.MyListRecyclerViewAdapter;
 import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.LoggedInUser;
 
@@ -23,23 +24,33 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AlertContent {
-
-    private MyListRecyclerViewAdapter adapter;
+public class AlertDuplicateContent {
+    private DuplicateViewAdapter adapter;
     private final RecyclerView recyclerView;
     private final List<AlertItem> items;
 
-    public AlertContent(RecyclerView recyclerView, MyListRecyclerViewAdapter adapter, List<AlertItem> items) {
+    private final Integer RANGE_OF_DUPLICATE_ALERTS_IN_METERS = 12000;
+    private final Double latitude;
+    private final Double longitude;
+    private final String alertName;
+    private final FragmentActivity fragmentActivity;
+
+    public AlertDuplicateContent(RecyclerView recyclerView, DuplicateViewAdapter adapter, List<AlertItem> items,
+                                 String alertName, Double longitude, Double latitude, FragmentActivity fragmentActivity) {
+        this.fragmentActivity = fragmentActivity;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.alertName = alertName;
         this.adapter = adapter;
         this.items = items;
         this.recyclerView = recyclerView;
-        getAlerts();
+        getAlertWithCategory(alertName);
 
     }
 
-    private void getAlerts() {
+    private void getAlertWithCategory(String alertName) {
         AlertMeService service = RestAdapter.getAlertMeService();
-        Call<ResponseMultipleData<Alert>> allAlerts = service.getAllAlerts();
+        Call<ResponseMultipleData<Alert>> allAlerts = service.getAlertByDistance(latitude, longitude, Double.valueOf(RANGE_OF_DUPLICATE_ALERTS_IN_METERS));
         allAlerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
 
             @Override
@@ -47,18 +58,29 @@ public class AlertContent {
                 if (response.isSuccessful()) {
                     List<Alert> alerts = response.body().getData();
                     List<AlertItem> temp = new ArrayList<>();
-                    alerts.forEach(alert -> {
-                        temp.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude())));
-                    });
+
+                    alerts.stream()
+                            .filter((alert -> alert.getAlertType().getName().equals(alertName)))
+                            .forEach(alert -> temp.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude()))));
+
                     if (items.size() != temp.size()) {
                         items.clear();
                         items.addAll(temp);
                     }
-
                     items.sort(new DistanceComparator());
                     adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
 
+                    if (items.size() == 0) {
+                        Context applicationContext = fragmentActivity.getApplicationContext();
+                        SharedPreferences sharedPref = applicationContext.getSharedPreferences(
+                                applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("createAlert", "yes");
+                        editor.apply();
+                        fragmentActivity.getSupportFragmentManager().popBackStack();
+                    }
                 } else {
                     System.out.println("Unsuccessful to fetch all alerts AlertContent.class");
                 }
@@ -91,6 +113,5 @@ public class AlertContent {
         }
         return res;
     }
-
 
 }
