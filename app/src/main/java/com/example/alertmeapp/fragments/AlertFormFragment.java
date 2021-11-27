@@ -11,7 +11,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -30,11 +29,10 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -46,10 +44,6 @@ import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.utils.LoggedInUser;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -116,7 +110,7 @@ public class AlertFormFragment extends Fragment {
         Button buttonLocalization = view.findViewById(R.id.enter_localization);
 
         buttonPhoto.setOnClickListener(this::onTakePhotoClick);
-        buttonUploader.setOnClickListener(this::onFormUploadClick);
+        buttonUploader.setOnClickListener(this::onCheckDuplicates);
         buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
         buttonLocalization.setOnClickListener(this::onChooseLocalization);
 
@@ -190,47 +184,54 @@ public class AlertFormFragment extends Fragment {
         });
     }
 
-    public void onFormUploadClick(View view) {
-        String title = titleView.getText().toString();
-        String description = descriptionView.getText().toString();
+    public void onCheckDuplicates(View view) {
+
+        Bundle bundle = new Bundle();
         String category = categorySpinner.getSelectedItem().toString();
-        boolean titleValid = validateTitle(title);
-        boolean descriptionValid = validateDescription(description);
+        bundle.putLong("alertTypeId", getSelectedCategoryAlertType(category).getId());
+        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+        navController.navigate(R.id.duplicateFragment, bundle);
 
-        if (!titleValid) {
-            titleInvalidView.setText(INVALID_TITLE);
-        } else {
-            titleInvalidView.setText("");
-        }
-
-        if (!descriptionValid) {
-            titleInvalidView.setText(INVALID_TITLE);
-            descriptionInvalidView.setText(INVALID_DESCRIPTION);
-        } else {
-            descriptionInvalidView.setText("");
-        }
-
-        if (longitude == null || latitude == null) {
-            localizationInvalid.setText(INVALID_LOCALIZATION);
-        } else {
-            localizationInvalid.setText("");
-        }
-
-        if (titleValid && descriptionValid && longitude != null && latitude != null) {
-            AlertRequest alertRequest = new AlertRequest.Builder()
-                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
-                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
-                    .withDescription(description)
-                    .withTitle(title)
-                    .withLatitude(latitude)
-                    .withLongitude(longitude)
-                    .withNumberOfVotes(0)
-                    .withImage(getUploadedPhotoBytesArray())
-                    .build();
-            requestToSaveAlert(alertRequest);
+//        String title = titleView.getText().toString();
+//        String description = descriptionView.getText().toString();
+//        String category = categorySpinner.getSelectedItem().toString();
+//        boolean titleValid = validateTitle(title);
+//        boolean descriptionValid = validateDescription(description);
+//
+//        if (!titleValid) {
+//            titleInvalidView.setText(INVALID_TITLE);
+//        } else {
+//            titleInvalidView.setText("");
+//        }
+//
+//        if (!descriptionValid) {
+//            titleInvalidView.setText(INVALID_TITLE);
+//            descriptionInvalidView.setText(INVALID_DESCRIPTION);
+//        } else {
+//            descriptionInvalidView.setText("");
+//        }
+//
+//        if (longitude == null || latitude == null) {
+//            localizationInvalid.setText(INVALID_LOCALIZATION);
+//        } else {
+//            localizationInvalid.setText("");
+//        }
+//
+//        if (titleValid && descriptionValid && longitude != null && latitude != null) {
+//            AlertRequest alertRequest = new AlertRequest.Builder()
+//                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
+//                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
+//                    .withDescription(description)
+//                    .withTitle(title)
+//                    .withLatitude(latitude)
+//                    .withLongitude(longitude)
+//                    .withNumberOfVotes(0)
+//                    .withImage(getUploadedPhotoBytesArray())
+//                    .build();
+//            requestToSaveAlert(alertRequest);
 //            requestToSaveAlert(new AlertRequest(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
 //                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
-        }
+//        }
     }
 
     private void requestToSaveAlert(AlertRequest alertRequest) {

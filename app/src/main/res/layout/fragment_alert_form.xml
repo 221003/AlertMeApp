@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:onClick="onFormUploadClick"
-            android:text="@string/alert_form_upload_form" />
+            android:text="Check for duplicates" />
 
         <!-- really dummy margin for scrolling -->
         <TextView
