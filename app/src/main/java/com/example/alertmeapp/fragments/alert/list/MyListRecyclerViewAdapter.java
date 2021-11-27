@@ -77,15 +77,15 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.downvote.setColorFilter(GRAY);
         findVote(new VoteRequest(alert.getId(), USER_ID), holder);
 
-//        holder.titleView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Bundle bundle = new Bundle();
-//                bundle.putLong("alertId", alert.getId());
-//                NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
-//                navController.navigate(R.id.alertDetailsFragment, bundle);
-//            }
-//        });
+        holder.titleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("alertId", alert.getId());
+                NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
+                navController.navigate(R.id.alertDetailsFragment, bundle);
+            }
+        });
         holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
         holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
     }

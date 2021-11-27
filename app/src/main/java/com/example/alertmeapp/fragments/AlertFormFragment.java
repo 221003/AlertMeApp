@@ -32,7 +32,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -139,10 +138,12 @@ public class AlertFormFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        System.out.println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
         getNewAlertCords();
     }
 
     private void getNewAlertCords() {
+        //za kazdymr azem a nie po wybraniu
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         this.longitude = Double.valueOf(sharedPref.getFloat("longitude", 51.759f));
@@ -184,13 +185,27 @@ public class AlertFormFragment extends Fragment {
         });
     }
 
+    private boolean isNewAlertValid() {
+        if (longitude != null && latitude != null) {
+            return true;
+        }
+        return false;
+    }
+
     public void onCheckDuplicates(View view) {
 
-        Bundle bundle = new Bundle();
-        String category = categorySpinner.getSelectedItem().toString();
-        bundle.putLong("alertTypeId", getSelectedCategoryAlertType(category).getId());
-        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
-        navController.navigate(R.id.duplicateFragment, bundle);
+        if (isNewAlertValid()) {
+            Bundle bundle = new Bundle();
+            String category = categorySpinner.getSelectedItem().toString();
+            bundle.putDouble("longitude", longitude);
+            bundle.putDouble("latitude", latitude);
+            bundle.putLong("alertTypeId", getSelectedCategoryAlertType(category).getId() == null
+                    ? alertTypeRequests.get(0).getId() : getSelectedCategoryAlertType(category).getId());
+            NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+            navController.navigate(R.id.duplicateFragment, bundle);
+        } else {
+            System.out.println("nie ustawiels lokalizacji byczqu");
+        }
 
 //        String title = titleView.getText().toString();
 //        String description = descriptionView.getText().toString();
@@ -247,6 +262,7 @@ public class AlertFormFragment extends Fragment {
                     displayToast("Error on save new alert");
                 }
             }
+
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 displayToast("Error on save new alert");
@@ -261,8 +277,7 @@ public class AlertFormFragment extends Fragment {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-        }
-        else {
+        } else {
             return null;
         }
     }

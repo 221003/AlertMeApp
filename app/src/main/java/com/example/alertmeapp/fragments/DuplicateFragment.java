@@ -26,11 +26,17 @@ public class DuplicateFragment extends Fragment {
     private RecyclerView recyclerView;
     private MyListRecyclerViewAdapter adapter;
     private List<AlertItem> items = new ArrayList<>();
+
     private Long alertTypeId;
+    private Double longitude;
+    private Double latitude;
 
     public DuplicateFragment() {
-        Bundle extras = getActivity().getIntent().getExtras();
-        this.alertTypeId = extras.getLong("alertTypeId");
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -38,38 +44,11 @@ public class DuplicateFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_duplicate, container, false);
         Context context = view.getContext();
-//        categorySpinner = view.findViewById(R.id.alert_form_category);
-//        categorySpinner.setSelected(false);
-//        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//                if (spinnerFirstTrigger) {
-//                    String category = categorySpinner.getSelectedItem().toString();
-//                    System.out.println("wchodze do psinner onitemseleceted");
-//                    if (!category.equals("all")) {
-//                        List<AlertItem> copyList = new ArrayList<>();
-//                        for (int i = 0; i < items.size(); i++) {
-//                            if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
-//                                copyList.add(items.get(i));
-//                            }
-//                        }
-//                        copyList.sort(new DistanceComparator());
-//                        adapter = new MyListRecyclerViewAdapter(getActivity(), copyList);
-//                    } else {
-//                        adapter = new MyListRecyclerViewAdapter(getActivity(), items);
-//                    }
-//                    recyclerView.setAdapter(adapter);
-//                } else {
-//                    spinnerFirstTrigger = true;
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//            }
-//
-//        });
-//        populateCategorySpinner();
+
+        Bundle extras = this.getArguments();
+        this.latitude = extras.getDouble("latitude");
+        this.alertTypeId = extras.getLong("alertTypeId");
+        this.longitude = extras.getDouble("longitude");
 
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -77,27 +56,7 @@ public class DuplicateFragment extends Fragment {
         adapter = new MyListRecyclerViewAdapter(getActivity(), items);
         recyclerView.setAdapter(adapter);
 
-        new AlertContent(recyclerView, adapter, items);
-
-
-//        recyclerView.addOnItemTouchListener(
-//                new RecyclerItemClickListener(context, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(View view, int position) {
-//                        Bundle bundle = new Bundle();
-//                        bundle.putLong("alertId", items.get(position).getAlert().getId());
-//                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
-//                        navController.navigate(R.id.alertDetailsFragment, bundle);
-//                    }
-//
-//                    @Override
-//                    public void onLongItemClick(View view, int position) {
-//
-//                    }
-//                })
-//        );
-
-
+        new AlertContent(recyclerView, adapter, items, alertTypeId, longitude, latitude, getActivity());
         return view;
     }
 }
