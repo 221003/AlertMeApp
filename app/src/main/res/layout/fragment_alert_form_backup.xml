@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:transcriptMode="alwaysScroll"
+    android:orientation="vertical"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp">
+
+        <ImageView
+            android:id="@+id/alert_form_logo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/alertme_logo"
+            android:minWidth="50dp"
+            android:minHeight="50dp"
+            android:src="@mipmap/ic_launcher_round" />
+
+        <EditText
+            android:id="@+id/alert_form_title"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="64dp"
+            android:background="@drawable/input_background"
+            android:ems="10"
+            android:hint="@string/alert_form_title"
+            android:inputType="textPersonName"
+            android:padding="10dp" />
+
+        <TextView
+            android:id="@+id/alert_form_title_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red" />
+
+        <EditText
+            android:id="@+id/alert_form_description"
+            android:layout_width="match_parent"
+            android:layout_height="84dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/input_background"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/alert_form_description"
+            android:inputType="textMultiLine"
+            android:padding="10dp" />
+
+        <TextView
+            android:id="@+id/alert_form_description_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red" />
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/input_background"
+            android:orientation="horizontal" >
+
+            <Spinner
+                android:id="@+id/alert_form_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:spinnerMode="dropdown" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher_round" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/enter_localization"
+            android:onClick="onChooseLocalization"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/enter_localization" />
+
+        <TextView
+            android:id="@+id/enter_localization_invalid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/photo_upload_constraint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" >
+
+            <TextView
+                android:id="@+id/alert_image_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/alert_form_picture_info"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/choose_photo_button"
+                android:onClick="onChoosePhotoClick"
+                android:layout_width="64dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:drawableLeft="@android:drawable/ic_menu_upload"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/take_photo_btn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/take_photo_btn"
+                android:layout_width="64dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:drawableLeft="@android:drawable/ic_menu_camera"
+                android:onClick="onTakePhotoClick"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.684"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/uploaded_photo"
+                android:layout_width="92dp"
+                android:layout_height="64dp"
+                app:layout_constraintEnd_toStartOf="@+id/take_photo_btn"
+                app:layout_constraintHorizontal_bias="0.217"
+                app:layout_constraintStart_toStartOf="@+id/photo_upload_constraint"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/upload_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:onClick="onFormUploadClick"
+            android:text="@string/alert_form_upload_form" />
+
+        <!-- really dummy margin for scrolling -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
+
+    </LinearLayout>
+</ScrollView>

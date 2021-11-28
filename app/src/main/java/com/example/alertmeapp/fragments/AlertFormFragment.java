@@ -50,6 +50,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -82,7 +85,7 @@ public class AlertFormFragment extends Fragment {
     private final String INVALID_DESCRIPTION = "Description cannot be empty";
     private final String INVALID_LOCALIZATION = "Please enter the localization";
 
-    private EditText titleView;
+    private TextInputEditText titleView;
     private TextView titleInvalidView;
     private EditText descriptionView;
     private TextView descriptionInvalidView;
@@ -110,10 +113,10 @@ public class AlertFormFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_alert_form, container, false);
 
-        Button buttonPhoto = view.findViewById(R.id.take_photo_btn);
+        MaterialButton buttonPhoto = view.findViewById(R.id.take_photo_btn);
         Button buttonUploader = view.findViewById(R.id.upload_form);
-        Button buttonPhotoChooser = view.findViewById(R.id.choose_photo_button);
-        Button buttonLocalization = view.findViewById(R.id.enter_localization);
+        MaterialButton buttonPhotoChooser = view.findViewById(R.id.choose_photo_button);
+        MaterialButton buttonLocalization = view.findViewById(R.id.enter_localization);
 
         buttonPhoto.setOnClickListener(this::onTakePhotoClick);
         buttonUploader.setOnClickListener(this::onFormUploadClick);
@@ -124,13 +127,13 @@ public class AlertFormFragment extends Fragment {
         populateCategorySpinner();
 
         titleView = view.findViewById(R.id.alert_form_title);
-        titleInvalidView = view.findViewById(R.id.alert_form_title_invalid);
+        //titleInvalidView = view.findViewById(R.id.alert_form_title_invalid);
         descriptionView = view.findViewById(R.id.alert_form_description);
-        descriptionInvalidView = view.findViewById(R.id.alert_form_description_invalid);
+        //descriptionInvalidView = view.findViewById(R.id.alert_form_description_invalid);
         uploadedPhotoView = view.findViewById(R.id.uploaded_photo);
-        photoUploadInfoView = view.findViewById(R.id.alert_image_info);
+        // photoUploadInfoView = view.findViewById(R.id.alert_image_info);
         photoUploadLayout = view.findViewById(R.id.photo_upload_constraint);
-        localizationInvalid = view.findViewById(R.id.enter_localization_invalid);
+        //localizationInvalid = view.findViewById(R.id.enter_localization_invalid);
 
         //Hide photo upload section if camera is not available
         if (!checkCameraHardware(getActivity())) {
@@ -169,7 +172,7 @@ public class AlertFormFragment extends Fragment {
                 }
                 ArrayAdapter<String> adapter = null;
                 try {
-                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
+                    adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_list, categories);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -197,28 +200,22 @@ public class AlertFormFragment extends Fragment {
         boolean titleValid = validateTitle(title);
         boolean descriptionValid = validateDescription(description);
 
-        if (!titleValid) {
-            titleInvalidView.setText(INVALID_TITLE);
-        } else {
-            titleInvalidView.setText("");
-        }
+        if (!titleValid)
+            titleView.setError(INVALID_TITLE);
 
-        if (!descriptionValid) {
-            titleInvalidView.setText(INVALID_TITLE);
-            descriptionInvalidView.setText(INVALID_DESCRIPTION);
-        } else {
-            descriptionInvalidView.setText("");
-        }
+        if (!descriptionValid)
+            descriptionView.setError(INVALID_DESCRIPTION);
 
-        if (longitude == null || latitude == null) {
-            localizationInvalid.setText(INVALID_LOCALIZATION);
-        } else {
-            localizationInvalid.setText("");
-        }
+
+//        if (longitude == null || latitude == null) {
+//            localizationInvalid.setText(INVALID_LOCALIZATION);
+//        } else {
+//            localizationInvalid.setText("");
+//        }
 
         if (titleValid && descriptionValid && longitude != null && latitude != null) {
             AlertRequest alertRequest = new AlertRequest.Builder()
-                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
+                    .withUserId(LoggedInUser.getInstance(null, null, null).getId())
                     .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
                     .withDescription(description)
                     .withTitle(title)
@@ -228,8 +225,6 @@ public class AlertFormFragment extends Fragment {
                     .withImage(getUploadedPhotoBytesArray())
                     .build();
             requestToSaveAlert(alertRequest);
-//            requestToSaveAlert(new AlertRequest(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-//                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
         }
     }
 
@@ -246,6 +241,7 @@ public class AlertFormFragment extends Fragment {
                     displayToast("Error on save new alert");
                 }
             }
+
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 displayToast("Error on save new alert");
@@ -260,8 +256,7 @@ public class AlertFormFragment extends Fragment {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -342,7 +337,7 @@ public class AlertFormFragment extends Fragment {
     }
 
     private void showUploadedPhoto() {
-        photoUploadInfoView.setVisibility(View.INVISIBLE);
+        //  photoUploadInfoView.setVisibility(View.INVISIBLE);
         uploadedPhotoView.setVisibility(View.VISIBLE);
     }
 

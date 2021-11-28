@@ -4,12 +4,14 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
+import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
 import android.util.Patterns;
 import android.view.View;
@@ -36,6 +38,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 
@@ -48,21 +51,20 @@ import retrofit2.Response;
 public class SignInActivity extends AppCompatActivity {
 
     private final String INVALID_EMAIL = "Email invalid";
-    //TODO: provide useful error message for invalid password
     private final String EMPTY_PASSWORD = "Empty password field";
     private final String EMPTY_EMAIL = "Empty email field";
-    private final String SIGN_UP_INFO = "Or sign up here";
-    private final int INT_START = 11;
-    private final int INT_END = 15;
+    private final int INT_START = 20;
+    private final int INT_END = 32;
     private final int INCORRECT_PASSWORD_CODE = 10;
     private final int INCORRECT_LOGIN_CODE = 11;
+
+    private TextInputLayout tilEmail;
+    private TextInputLayout tilPassword;
+    private TextView linkToSignUpActivity;
     private final AlertMeService service = RestAdapter.getAlertMeService();
-    private TextView emailInvalidElement;
-    private TextView passwordInvalidElement;
-    private Object TextPaint;
 
 
-    private static String[] PERMISSIONS_LOCALIZATION = {
+    private static final String[] PERMISSIONS_LOCALIZATION = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
@@ -73,38 +75,18 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        emailInvalidElement = findViewById(R.id.emailInvalid);
-        passwordInvalidElement = findViewById(R.id.passwordInvalid);
-        signUpInfoInit();
+        tilEmail = findViewById(R.id.til_email);
+        tilPassword = findViewById(R.id.til_password);
+        linkToSignUpActivity = findViewById(R.id.text_have_acc);
+
+        SpannableString str = new SpannableString(linkToSignUpActivity.getText().toString());
+        str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                INT_START, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        linkToSignUpActivity.setText(str);
+        linkToSignUpActivity.setMovementMethod(LinkMovementMethod.getInstance());
+        linkToSignUpActivity.setOnClickListener(v -> changeActivityTo(SignUpActivity.class));
     }
 
-    private void signUpInfoInit() {
-        TextView singUpInfo = findViewById(R.id.sign_up_info);
-        singUpInfo.setHighlightColor(Color.TRANSPARENT);
-
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(@NonNull View view) {
-                //TODO: navigation to sign up activity
-            }
-
-            @Override
-            public void updateDrawState(android.text.TextPaint ds) {
-                if (singUpInfo.isPressed()) {
-                    ds.setColor(Color.BLACK);
-                } else {
-                    ds.setColor(Color.BLACK);
-                }
-            }
-        };
-
-        SpannableString str = new SpannableString(SIGN_UP_INFO);
-        str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), INT_START, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        str.setSpan(clickableSpan, INT_START, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        singUpInfo.setText(str);
-        singUpInfo.setMovementMethod(LinkMovementMethod.getInstance());
-        singUpInfo.setOnClickListener(v -> changeActivityTo(SignUpActivity.class));
-    }
 
     private void changeActivityTo(Class<?> activity) {
         startActivity(new Intent(getApplicationContext(), activity));
@@ -116,31 +98,26 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     public void onSignInClick(View view) {
-        EditText emailElement = findViewById(R.id.sign_in_email);
-        EditText passwordElement = findViewById(R.id.sign_in_password);
-        String email = emailElement.getText().toString();
-        String password = passwordElement.getText().toString();
-        boolean emailValid = validateEmail(email);
-        emailInvalidElement = findViewById(R.id.emailInvalid);
-        passwordInvalidElement = findViewById(R.id.passwordInvalid);
-        emailInvalidElement.setText("");
-        passwordInvalidElement.setText("");
-
+        tilEmail.setError("");
+        tilPassword.setError("");
+        String email = tilEmail.getEditText().getText().toString();
+        String password = tilPassword.getEditText().getText().toString();
+        boolean isEmailValid = validateEmail(email);
 
         if (email.isEmpty())
-            emailInvalidElement.setText(EMPTY_EMAIL);
-        else if (!emailValid)
-            emailInvalidElement.setText(INVALID_EMAIL);
-        if (password.isEmpty())
-            passwordInvalidElement.setText(EMPTY_PASSWORD);
+            tilEmail.setError(EMPTY_EMAIL);
+        else if (!isEmailValid)
+            tilEmail.setError(INVALID_EMAIL);
 
-        if (emailValid && !email.isEmpty() && !password.isEmpty())
-            requestToSignInUser(email, password, emailInvalidElement, passwordInvalidElement);
+        if (password.isEmpty())
+            tilPassword.setError(EMPTY_PASSWORD);
+
+        if (isEmailValid && !email.isEmpty() && !password.isEmpty())
+            requestToSignInUser(email, password);
     }
 
 
-    private void requestToSignInUser(String email, String password,
-                                     TextView emailInvalidElement, TextView passwordInvalidElement) {
+    private void requestToSignInUser(String email, String password) {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5000);
@@ -167,8 +144,6 @@ public class SignInActivity extends AppCompatActivity {
                                     changeActivityTo(MainActivity.class);
                                 } else {
                                     try {
-                                        System.out.println(response.code());
-                                        System.out.println(response.errorBody());
                                         Gson gson = new Gson();
                                         ResponseSingleData errorResponse = gson.fromJson(
                                                 response.errorBody().string(),
@@ -176,13 +151,12 @@ public class SignInActivity extends AppCompatActivity {
                                         int errorCode = errorResponse.getErrorCode();
                                         String errorMessage = errorResponse.getError();
                                         if (errorCode == INCORRECT_LOGIN_CODE)
-                                            emailInvalidElement.setText(errorMessage);
+                                            tilEmail.setError(errorMessage);
                                         else if (errorCode == INCORRECT_PASSWORD_CODE)
-                                            passwordInvalidElement.setText(errorMessage);
+                                            tilPassword.setError(errorMessage);
                                     } catch (IOException e) {
                                         displayToast();
                                     }
-
                                 }
                             }
 
