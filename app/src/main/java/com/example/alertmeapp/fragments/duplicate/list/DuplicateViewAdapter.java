@@ -109,7 +109,7 @@ public class DuplicateViewAdapter extends RecyclerView.Adapter<DuplicateViewAdap
                         applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
 
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("alertDuplicateId", String.valueOf(lastPositionButton));
+                editor.putString("alertDuplicateId", String.valueOf(alertList.get(lastPositionButton).getAlert().getId()));
                 editor.apply();
             }
         });
