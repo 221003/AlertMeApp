@@ -138,17 +138,28 @@ public class AlertFormFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
         getNewAlertCords();
-    }
+        if (getCreateAlert() != null || getAlertDuplicateId() != null) {
+            String createAlert = getCreateAlert();
+            if (createAlert == null) {
+                System.out.println("jestem nullem create alert");
+            } else {
+                System.out.println("nie jstem: " + createAlert);
+                removeCreateAlert();
+            }
 
-    private void getNewAlertCords() {
-        //za kazdymr azem a nie po wybraniu
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        this.longitude = Double.valueOf(sharedPref.getFloat("longitude", 19.457f));
-        this.latitude = Double.valueOf(sharedPref.getFloat("latitude", 51.759f));
-
+            String alertDuplicateId = getAlertDuplicateId();
+            if (alertDuplicateId == null) {
+                System.out.println("jestem nullem alertDuplicateId");
+            } else if (alertDuplicateId.equals("-1")) {
+                System.out.println("trzeba dodacnowy alert");
+                removeAlertDuplicateId();
+            } else {
+                System.out.println(alertDuplicateId);
+                System.out.println("trzeba zlajkowac alert o id podanym");
+                removeAlertDuplicateId();
+            }
+        }
     }
 
     private void populateCategorySpinner() {
@@ -186,10 +197,33 @@ public class AlertFormFragment extends Fragment {
     }
 
     private boolean isNewAlertValid() {
-        if (longitude != null && latitude != null) {
-            return true;
+        boolean valid = true;
+        String title = titleView.getText().toString();
+        String description = descriptionView.getText().toString();
+        boolean titleValid = validateTitle(title);
+        boolean descriptionValid = validateDescription(description);
+
+        if (!titleValid) {
+            titleInvalidView.setText(INVALID_TITLE);
+            valid = false;
+        } else {
+            titleInvalidView.setText("");
         }
-        return false;
+
+        if (!descriptionValid) {
+            descriptionInvalidView.setText(INVALID_DESCRIPTION);
+            valid = false;
+        } else {
+            descriptionInvalidView.setText("");
+        }
+
+        if (longitude == null || latitude == null) {
+            localizationInvalid.setText(INVALID_LOCALIZATION);
+            valid = false;
+        } else {
+            localizationInvalid.setText("");
+        }
+        return valid;
     }
 
     public void onCheckDuplicates(View view) {
@@ -395,5 +429,44 @@ public class AlertFormFragment extends Fragment {
                 .findFirst()
                 .get();
         return selectedCategory;
+    }
+
+    private void removeCreateAlert() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        sharedPref.edit().remove("createAlert").commit();
+    }
+
+    private void removeAlertDuplicateId() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        sharedPref.edit().remove("alertDuplicateId").commit();
+    }
+
+    private String getCreateAlert() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        return sharedPref.getString("createAlert", null);
+    }
+
+    private String getAlertDuplicateId() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        return sharedPref.getString("alertDuplicateId", null);
+    }
+
+    private void getNewAlertCords() {
+        final float LOCATION_NOT_SET = -999f;
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        this.longitude = Double.valueOf(sharedPref.getFloat("longitude", LOCATION_NOT_SET));
+        this.latitude = Double.valueOf(sharedPref.getFloat("latitude", LOCATION_NOT_SET));
+        if (latitude == LOCATION_NOT_SET || longitude == LOCATION_NOT_SET) {
+            this.longitude = null;
+            this.latitude = null;
+        }
+        sharedPref.edit().remove("longitude").commit();
+        sharedPref.edit().remove("latitude").commit();
+
     }
 }
