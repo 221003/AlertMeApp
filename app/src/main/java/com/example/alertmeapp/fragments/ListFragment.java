@@ -18,7 +18,7 @@
 //import com.example.alertmeapp.R;
 ////import com.example.alertmeapp.dummy.AlertContent;
 //import com.example.alertmeapp.dummy.RecyclerItemClickListener;
-//import com.example.alertmeapp.fragments.alert.list.AlertContent;
+//import com.example.alertmeapp.fragments.alert.AlertContent;
 //
 //
 ///**

@@ -1,4 +1,4 @@
-package com.example.alertmeapp.fragments.alert.list;
+package com.example.alertmeapp.fragments.alert;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -28,8 +28,6 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import okhttp3.ResponseBody;

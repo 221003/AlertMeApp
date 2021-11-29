@@ -1,11 +1,9 @@
-package com.example.alertmeapp.fragments.alert.list;
+package com.example.alertmeapp.fragments.alert;
 
 import android.location.Location;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.alertmeapp.api.data.User;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.Alert;
@@ -14,7 +12,6 @@ import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -26,18 +23,25 @@ public class AlertContent {
     private MyListRecyclerViewAdapter adapter;
     private final RecyclerView recyclerView;
     private final List<AlertItem> items;
+    private boolean myAlerts;
 
-    public AlertContent(RecyclerView recyclerView, MyListRecyclerViewAdapter adapter, List<AlertItem> items) {
+    public AlertContent(RecyclerView recyclerView, MyListRecyclerViewAdapter adapter, List<AlertItem> items, boolean myAlerts) {
         this.adapter = adapter;
         this.items = items;
         this.recyclerView = recyclerView;
+        this.myAlerts = myAlerts;
         getAlerts();
     }
 
     private void getAlerts() {
         AlertMeService service = RestAdapter.getAlertMeService();
-        Call<ResponseMultipleData<Alert>> allAlerts = service.getAllAlerts();
-        allAlerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
+        Call<ResponseMultipleData<Alert>> alerts;
+        if (myAlerts) {
+            alerts = service.getUserAlerts(LoggedInUser.getInstance(null,null,null).getId());
+        } else {
+            alerts = service.getAllAlerts();
+        }
+        alerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
 
             @Override
             public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {

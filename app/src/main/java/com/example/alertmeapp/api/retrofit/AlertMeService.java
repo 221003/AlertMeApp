@@ -54,4 +54,9 @@ public interface AlertMeService {
 
     @GET("/api/alerts/{id}")
     Call<ResponseSingleData<Alert>> getAlert(@Path("id") Long id);
+
+    @PUT("/api/users/{id}/alerts")
+    Call<ResponseMultipleData<Alert>> getUserAlerts(@Path("id") Long id);
+
+
 }
