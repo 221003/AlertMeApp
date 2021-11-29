@@ -1,6 +1,8 @@
 package com.example.alertmeapp.fragments;
 
+
 import static android.app.Activity.RESULT_OK;
+
 
 import android.Manifest;
 import android.content.Context;
@@ -11,7 +13,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +20,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,9 +32,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -40,21 +40,22 @@ import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.activities.MapsActivity;
+import com.example.alertmeapp.api.data.Alert;
+import com.example.alertmeapp.api.data.Vote;
 import com.example.alertmeapp.api.requests.AlertRequest;
+import com.example.alertmeapp.api.requests.VoteRequest;
+import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.utils.LoggedInUser;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.common.util.ScopeUtil;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -103,8 +104,12 @@ public class AlertFormFragment extends Fragment {
             new ActivityResultContracts.StartActivityForResult(),
             result -> processChosenPhoto(result));
 
+    public static final float LOCATION_NOT_SET = -999f;
+
     private Double longitude;
     private Double latitude;
+    private String categoryItemName = null;
+    private String imageByteArray;
     private final AlertMeService service = RestAdapter.getAlertMeService();
     private List<AlertType> alertTypeRequests = new ArrayList<>();
 
@@ -113,27 +118,38 @@ public class AlertFormFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_alert_form, container, false);
 
-        MaterialButton buttonPhoto = view.findViewById(R.id.take_photo_btn);
+        Button buttonPhoto = view.findViewById(R.id.take_photo_btn);
         Button buttonUploader = view.findViewById(R.id.upload_form);
-        MaterialButton buttonPhotoChooser = view.findViewById(R.id.choose_photo_button);
-        MaterialButton buttonLocalization = view.findViewById(R.id.enter_localization);
+        Button buttonPhotoChooser = view.findViewById(R.id.choose_photo_button);
+        Button buttonLocalization = view.findViewById(R.id.enter_localization);
 
         buttonPhoto.setOnClickListener(this::onTakePhotoClick);
-        buttonUploader.setOnClickListener(this::onFormUploadClick);
+        buttonUploader.setOnClickListener(this::onCheckDuplicates);
         buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
         buttonLocalization.setOnClickListener(this::onChooseLocalization);
 
         categorySpinner = view.findViewById(R.id.alert_form_category);
+        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                categoryItemName = categorySpinner.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         populateCategorySpinner();
 
         titleView = view.findViewById(R.id.alert_form_title);
-        //titleInvalidView = view.findViewById(R.id.alert_form_title_invalid);
+        titleInvalidView = view.findViewById(R.id.alert_form_title_invalid);
         descriptionView = view.findViewById(R.id.alert_form_description);
-        //descriptionInvalidView = view.findViewById(R.id.alert_form_description_invalid);
+        descriptionInvalidView = view.findViewById(R.id.alert_form_description_invalid);
         uploadedPhotoView = view.findViewById(R.id.uploaded_photo);
-        // photoUploadInfoView = view.findViewById(R.id.alert_image_info);
+        photoUploadInfoView = view.findViewById(R.id.alert_image_info);
         photoUploadLayout = view.findViewById(R.id.photo_upload_constraint);
-        //localizationInvalid = view.findViewById(R.id.enter_localization_invalid);
+        localizationInvalid = view.findViewById(R.id.enter_localization_invalid);
 
         //Hide photo upload section if camera is not available
         if (!checkCameraHardware(getActivity())) {
@@ -141,7 +157,6 @@ public class AlertFormFragment extends Fragment {
         } else {
             uploadedPhotoView.setVisibility(View.INVISIBLE);
         }
-
         return view;
     }
 
@@ -149,14 +164,164 @@ public class AlertFormFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getNewAlertCords();
+        if (imageByteArray == null) {
+            System.out.println("zdjeciaq nie ma");
+        } else {
+            System.out.println("zdjecie jest");
+        }
+        if (getCreateAlert() != null || getAlertDuplicateId() != null) {
+            System.out.println("wpsolrzednie: " + longitude + " " + latitude);
+            String createAlert = getCreateAlert();
+            System.out.println("2: " + categoryItemName);
+            if (createAlert == null) {
+                System.out.println("jestem nullem create alert");
+            } else {
+                System.out.println("111trzeba dodac alert: " + createAlert);
+
+                String title = titleView.getText().toString();
+                String description = descriptionView.getText().toString();
+                AlertRequest alertRequest = new AlertRequest.Builder()
+                        .withUserId(LoggedInUser.getInstance(null, null, null).getId())
+                        .withAlertTypeId(getSelectedCategoryAlertType(categoryItemName).getId())
+                        .withDescription(description)
+                        .withTitle(title)
+                        .withLatitude(latitude)
+                        .withLongitude(longitude)
+                        .withNumberOfVotes(0)
+                        .withImage(imageByteArray)
+                        .build();
+                System.out.println(alertRequest);
+                requestToSaveAlert(alertRequest);
+
+                removeCreateAlert();
+            }
+
+            String alertDuplicateId = getAlertDuplicateId();
+            if (alertDuplicateId == null) {
+                System.out.println("jestem nullem alertDuplicateId");
+            } else if (alertDuplicateId.equals("-1")) {
+                System.out.println("222trzeba dodacnowy alert");
+
+                String title = titleView.getText().toString();
+                String description = descriptionView.getText().toString();
+                AlertRequest alertRequest = new AlertRequest.Builder()
+                        .withUserId(LoggedInUser.getInstance(null, null, null).getId())
+                        .withAlertTypeId(getSelectedCategoryAlertType(categoryItemName).getId())
+                        .withDescription(description)
+                        .withTitle(title)
+                        .withLatitude(latitude)
+                        .withLongitude(longitude)
+                        .withNumberOfVotes(0)
+                        .withImage(imageByteArray)
+                        .build();
+                System.out.println(alertRequest);
+                requestToSaveAlert(alertRequest);
+
+                removeAlertDuplicateId();
+            } else {
+                System.out.println(alertDuplicateId);
+                System.out.println("trzeba zlajkowac alert o id podanym");
+
+                createVote(new VoteRequest(Long.valueOf(alertDuplicateId), LoggedInUser.getLoggedUser().getId(), true));
+                AlertMeService service = RestAdapter.getAlertMeService();
+                Call<ResponseSingleData<Alert>> alert = service.getAlert(Long.valueOf(alertDuplicateId));
+                alert.enqueue(new Callback<ResponseSingleData<Alert>>() {
+                    @Override
+                    public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
+                        if (response.isSuccessful()) {
+                            Alert data = response.body().getData();
+                            data.setNumber_of_votes(data.getNumber_of_votes() + 1);
+                            updateAlert(data);
+
+                        } else {
+                            System.out.println("Unsuccessful to fetch alert");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
+                        System.out.println("Failed to fetch alert");
+                    }
+                });
+                removeAlertDuplicateId();
+            }
+            removeNewAlertCords();
+        }
     }
 
-    private void getNewAlertCords() {
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        this.longitude = Double.valueOf(sharedPref.getFloat("longitude", 51.759f));
-        this.latitude = Double.valueOf(sharedPref.getFloat("latitude", 19.457f));
+    private void updateAlert(Alert alert) {
+        AlertRequest alertRequest = new AlertRequest.Builder()
+                .withAlertTypeId(alert.getAlertType().getId())
+                .withDescription(alert.getDescription())
+                .withLatitude(alert.getLatitude())
+                .withLongitude(alert.getLongitude())
+                .withImage(alert.getImage())
+                .withTitle(alert.getTitle())
+                .withNumberOfVotes(alert.getNumber_of_votes())
+                .withUserId(alert.getUser().getId())
+                .build();
+        System.out.println(alertRequest);
+        Call<ResponseSingleData<Alert>> call = service.updateAlert(alertRequest, alert.getId());
+        call.enqueue(new Callback<ResponseSingleData<Alert>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
+                System.out.println("REQUEST OK");
+                System.out.println(response.code());
+                NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                navController.navigate(R.id.mapsFragment);
+                displayToast("Added like to alert");
 
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void createVote(VoteRequest voteRequest) {
+        Call<ResponseSingleData<Vote>> call = service.createVote(voteRequest);
+        System.out.println(voteRequest);
+        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
+                System.out.println("REQUEST CODE");
+                System.out.println(response.code());
+                if (!response.isSuccessful()) {
+                    Gson gson = new Gson();
+                    try {
+                        ResponseSingleData errorResponse = gson.fromJson(
+                                response.errorBody().string(),
+                                ResponseSingleData.class);
+                        int existingId = errorResponse.getErrorCode();
+                        updateVote(voteRequest, (long) existingId);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void updateVote(VoteRequest voteRequest, Long id) {
+        Call<ResponseSingleData<Vote>> call = service.updateVote(voteRequest, id);
+        System.out.println(voteRequest);
+        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
+                System.out.println("REQUEST CODE");
+                System.out.println(response.code());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
+            }
+        });
     }
 
     private void populateCategorySpinner() {
@@ -172,7 +337,7 @@ public class AlertFormFragment extends Fragment {
                 }
                 ArrayAdapter<String> adapter = null;
                 try {
-                    adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item_list, categories);
+                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -193,39 +358,86 @@ public class AlertFormFragment extends Fragment {
         });
     }
 
-    public void onFormUploadClick(View view) {
+    private boolean isNewAlertValid() {
+        boolean isValidate = true;
         String title = titleView.getText().toString();
         String description = descriptionView.getText().toString();
-        String category = categorySpinner.getSelectedItem().toString();
         boolean titleValid = validateTitle(title);
         boolean descriptionValid = validateDescription(description);
-
-        if (!titleValid)
+        if (!titleValid) {
+            isValidate = false;
             titleView.setError(INVALID_TITLE);
+        }
 
-        if (!descriptionValid)
+        if (!descriptionValid) {
+            isValidate = false;
             descriptionView.setError(INVALID_DESCRIPTION);
+        }
 
 
+        if (longitude == null || latitude == null || latitude == LOCATION_NOT_SET || longitude == LOCATION_NOT_SET) {
+            localizationInvalid.setText(INVALID_LOCALIZATION);
+            isValidate = false;
+        }
+
+        return isValidate;
+    }
+
+    public void onCheckDuplicates(View view) {
+
+        if (isNewAlertValid()) {
+            Bundle bundle = new Bundle();
+            String category = categorySpinner.getSelectedItem().toString();
+            bundle.putDouble("longitude", longitude);
+            bundle.putDouble("latitude", latitude);
+            bundle.putString("alertName", getSelectedCategoryAlertType(category).getName() == null
+                    ? alertTypeRequests.get(0).getName() : getSelectedCategoryAlertType(category).getName());
+            NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+            navController.navigate(R.id.duplicateFragment, bundle);
+        } else {
+            System.out.println("nie ustawiels lokalizacji byczqu");
+        }
+
+//        String title = titleView.getText().toString();
+//        String description = descriptionView.getText().toString();
+//        String category = categorySpinner.getSelectedItem().toString();
+//        boolean titleValid = validateTitle(title);
+//        boolean descriptionValid = validateDescription(description);
+//
+//        if (!titleValid) {
+//            titleInvalidView.setText(INVALID_TITLE);
+//        } else {
+//            titleInvalidView.setText("");
+//        }
+//
+//        if (!descriptionValid) {
+//            titleInvalidView.setText(INVALID_TITLE);
+//            descriptionInvalidView.setText(INVALID_DESCRIPTION);
+//        } else {
+//            descriptionInvalidView.setText("");
+//        }
+//
 //        if (longitude == null || latitude == null) {
 //            localizationInvalid.setText(INVALID_LOCALIZATION);
 //        } else {
 //            localizationInvalid.setText("");
 //        }
-
-        if (titleValid && descriptionValid && longitude != null && latitude != null) {
-            AlertRequest alertRequest = new AlertRequest.Builder()
-                    .withUserId(LoggedInUser.getInstance(null, null, null).getId())
-                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
-                    .withDescription(description)
-                    .withTitle(title)
-                    .withLatitude(latitude)
-                    .withLongitude(longitude)
-                    .withNumberOfVotes(0)
-                    .withImage(getUploadedPhotoBytesArray())
-                    .build();
-            requestToSaveAlert(alertRequest);
-        }
+//
+//        if (titleValid && descriptionValid && longitude != null && latitude != null) {
+//            AlertRequest alertRequest = new AlertRequest.Builder()
+//                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
+//                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
+//                    .withDescription(description)
+//                    .withTitle(title)
+//                    .withLatitude(latitude)
+//                    .withLongitude(longitude)
+//                    .withNumberOfVotes(0)
+//                    .withImage(getUploadedPhotoBytesArray())
+//                    .build();
+//            requestToSaveAlert(alertRequest);
+//            requestToSaveAlert(new AlertRequest(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
+//                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
+//        }
     }
 
     private void requestToSaveAlert(AlertRequest alertRequest) {
@@ -333,11 +545,12 @@ public class AlertFormFragment extends Fragment {
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             uploadedPhotoView.setImageBitmap(imageBitmap);
             showUploadedPhoto();
+            imageByteArray = getUploadedPhotoBytesArray();
         }
     }
 
     private void showUploadedPhoto() {
-        //  photoUploadInfoView.setVisibility(View.INVISIBLE);
+        //photoUploadInfoView.setVisibility(View.INVISIBLE);
         uploadedPhotoView.setVisibility(View.VISIBLE);
     }
 
@@ -374,5 +587,43 @@ public class AlertFormFragment extends Fragment {
                 .findFirst()
                 .get();
         return selectedCategory;
+    }
+
+    private void removeCreateAlert() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        sharedPref.edit().remove("createAlert").commit();
+    }
+
+    private void removeAlertDuplicateId() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        sharedPref.edit().remove("alertDuplicateId").commit();
+    }
+
+    private String getCreateAlert() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        return sharedPref.getString("createAlert", null);
+    }
+
+    private String getAlertDuplicateId() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        return sharedPref.getString("alertDuplicateId", null);
+    }
+
+    private void removeNewAlertCords() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        sharedPref.edit().remove("longitude").commit();
+        sharedPref.edit().remove("latitude").commit();
+    }
+
+    private void getNewAlertCords() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        this.longitude = Double.valueOf(sharedPref.getFloat("longitude", LOCATION_NOT_SET));
+        this.latitude = Double.valueOf(sharedPref.getFloat("latitude", LOCATION_NOT_SET));
     }
 }

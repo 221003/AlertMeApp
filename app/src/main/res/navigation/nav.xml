@@ -31,4 +31,9 @@
         android:name="com.example.alertmeapp.fragments.AlertDetailsFragment"
         android:label="fragment_alert_details"
         tools:layout="@layout/fragment_alert_details" />
+    <fragment
+        android:id="@+id/duplicateFragment"
+        android:name="com.example.alertmeapp.fragments.duplicate.list.DuplicateFragment"
+        android:label="fragment_duplicate_alert"
+        tools:layout="@layout/fragment_duplicate_list" />
 </navigation>

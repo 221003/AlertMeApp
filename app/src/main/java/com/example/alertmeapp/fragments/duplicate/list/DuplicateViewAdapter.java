@@ -1,5 +1,8 @@
-package com.example.alertmeapp.fragments.alert;
+package com.example.alertmeapp.fragments.duplicate.list;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -8,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +28,8 @@ import com.example.alertmeapp.api.requests.VoteRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+
+import com.example.alertmeapp.fragments.alert.AlertItem;
 import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 
@@ -35,8 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
+public class DuplicateViewAdapter extends RecyclerView.Adapter<DuplicateViewAdapter.ViewHolder> {
 
     private final FragmentActivity activity;
     private final List<AlertItem> alertList;
@@ -45,35 +50,70 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     private final PorterDuffColorFilter GRAY = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
     private final AlertMeService service = RestAdapter.getAlertMeService();
     private final long USER_ID = 1L;
+    private final int NO_DUPLICATE_VALUE = -1;
+    private RadioButton lastRadioButton = null;
+    private int lastPositionButton = 0;
 
-
-    public MyListRecyclerViewAdapter(FragmentActivity activity, List<AlertItem> items) {
+    public DuplicateViewAdapter(FragmentActivity activity, List<AlertItem> items) {
         this.alertList = items;
         this.activity = activity;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DuplicateViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_list, parent, false);
-        return new ViewHolder(view);
+                .inflate(R.layout.fragment_duplicate, parent, false);
+        return new DuplicateViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final DuplicateViewAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+
+
+        Context applicationContext = activity.getApplicationContext();
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(
+                applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("alertDuplicateId", String.valueOf(NO_DUPLICATE_VALUE));
+        editor.apply();
+
+
         Alert alert = alertList.get(position).getAlert();
         String distance = alertList.get(position).getDistance();
 
         holder.titleView.setText(alert.getTitle());
         holder.typeView.setText(alert.getAlertType().getName());
         holder.rangeView.setText(distance);
-        holder.alertVotes.setText(String.valueOf(alert.getNumber_of_votes()));
         int color = getColorBasedOnAlertType(alert.getAlertType().getName());
         holder.materialCardView.setStrokeColor(color);
-        holder.upvote.setColorFilter(GRAY);
-        holder.downvote.setColorFilter(GRAY);
         findVote(new VoteRequest(alert.getId(), USER_ID), holder);
+
+        holder.radioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (lastRadioButton == null) {
+                    lastRadioButton = (RadioButton) view;
+                    lastPositionButton = position;
+                } else if (lastPositionButton == position) {
+                    lastRadioButton.setChecked(false);
+                    lastRadioButton = (RadioButton) view;
+                    lastPositionButton = NO_DUPLICATE_VALUE;
+                } else {
+                    lastRadioButton.setChecked(false);
+                    lastRadioButton = (RadioButton) view;
+                    lastPositionButton = position;
+                }
+                Context applicationContext = activity.getApplicationContext();
+                SharedPreferences sharedPref = applicationContext.getSharedPreferences(
+                        applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("alertDuplicateId", String.valueOf(alertList.get(lastPositionButton).getAlert().getId()));
+                editor.apply();
+            }
+        });
 
         holder.titleView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,8 +124,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 navController.navigate(R.id.alertDetailsFragment, bundle);
             }
         });
-        holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
-        holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
     }
 
     private int getColorBasedOnAlertType(String alertType) {
@@ -133,27 +171,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         });
     }
 
-    private void handleUpVote(ImageView upvote, ImageView downvote, TextView alertVotes, Alert alert) {
-        if (upvote.getColorFilter().equals(GRAY)) {
-            int numberOfVotes = Integer.parseInt(alertVotes.getText().toString()) + 1;
-            if (downvote.getColorFilter().equals(RED))
-                numberOfVotes++;
-            upvote.setColorFilter(GREEN);
-            downvote.setColorFilter(GRAY);
-            alertVotes.setText(String.valueOf(numberOfVotes));
-            alert.setNumber_of_votes(numberOfVotes);
-            updateAlert(alert);
-            createVote(new VoteRequest(alert.getId(), USER_ID, true));
-        } else if (upvote.getColorFilter().equals(GREEN)) {
-            upvote.setColorFilter(GRAY);
-            int numberOfVotes = Integer.parseInt(alertVotes.getText().toString());
-            alertVotes.setText(String.valueOf(--numberOfVotes));
-            alert.setNumber_of_votes(numberOfVotes);
-            updateAlert(alert);
-            findAndDeleteVote(new VoteRequest(alert.getId(), USER_ID));
-        }
-    }
-
     private void createVote(VoteRequest voteRequest) {
         Call<ResponseSingleData<Vote>> call = service.createVote(voteRequest);
         System.out.println(voteRequest);
@@ -199,28 +216,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         });
     }
 
-    private void handleDownVote(ImageView upvote, ImageView downvote, TextView alertVotes, Alert alert) {
-        if (downvote.getColorFilter().equals(GRAY)) {
-            int numberOfVotes = Integer.parseInt(alertVotes.getText().toString()) - 1;
-            if (upvote.getColorFilter().equals(GREEN))
-                numberOfVotes--;
-            downvote.setColorFilter(RED);
-            upvote.setColorFilter(GRAY);
-            alertVotes.setText(String.valueOf(numberOfVotes));
-            alert.setNumber_of_votes(numberOfVotes);
-            updateAlert(alert);
-            createVote(new VoteRequest(alert.getId(), USER_ID, false));
-        } else if (downvote.getColorFilter().equals(RED)) {
-            downvote.setColorFilter(GRAY);
-            int numberOfVotes = Integer.parseInt(alertVotes.getText().toString());
-            alertVotes.setText(String.valueOf(++numberOfVotes));
-            alert.setNumber_of_votes(numberOfVotes);
-            updateAlert(alert);
-            findAndDeleteVote(new VoteRequest(alert.getId(), USER_ID, false));
-        }
-    }
-
-    private void findVote(VoteRequest voteRequest, ViewHolder holder) {
+    private void findVote(VoteRequest voteRequest, DuplicateViewAdapter.ViewHolder holder) {
         Call<ResponseSingleData<Vote>> call = service.findVote(voteRequest);
         call.enqueue(new Callback<ResponseSingleData<Vote>>() {
             @Override
@@ -229,53 +225,12 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 System.out.println(response.code());
                 if (response.body() != null)
                     System.out.println("is upped" + response.body());
-                if (response.body() == null) {
-                    holder.upvote.setColorFilter(GRAY);
-                    holder.downvote.setColorFilter(GRAY);
-                } else if (response.body().getData().isUpped())
-                    holder.upvote.setColorFilter(GREEN);
-                else if (!response.body().getData().isUpped())
-                    holder.downvote.setColorFilter(RED);
-
             }
 
             @Override
             public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
             }
         });
-    }
-
-    private void deleteVote(Long voteId) {
-        Call<ResponseBody> call = service.deleteVote(voteId);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                // System.out.println("DELETE VOTE CODE");
-//                System.out.println(response.code());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-            }
-        });
-    }
-
-    private void findAndDeleteVote(VoteRequest voteRequest) {
-
-        Call<ResponseSingleData<Vote>> call = service.findVote(voteRequest);
-        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                //System.out.println("FIND VOTE CODE");
-
-                deleteVote(response.body().getData().getId());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
-            }
-        });
-
     }
 
     @Override
@@ -287,9 +242,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         private final TextView titleView;
         private final TextView typeView;
         private final TextView rangeView;
-        private final TextView alertVotes;
-        public final ImageView upvote;
-        private final ImageView downvote;
+        private final RadioButton radioButton;
         private final MaterialCardView materialCardView;
 
         public ViewHolder(View view) {
@@ -298,9 +251,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
             titleView = view.findViewById(R.id.titleTextView);
             typeView = view.findViewById(R.id.typeTextView);
             rangeView = view.findViewById(R.id.rangeTextView);
-            alertVotes = view.findViewById(R.id.alert_votes);
-            upvote = view.findViewById(R.id.upvote);
-            downvote = view.findViewById(R.id.downvote);
+            radioButton = view.findViewById(R.id.radio_button);
         }
     }
 }
