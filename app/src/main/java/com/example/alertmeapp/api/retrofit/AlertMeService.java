@@ -55,7 +55,12 @@ public interface AlertMeService {
     @GET("/api/alerts/{id}")
     Call<ResponseSingleData<Alert>> getAlert(@Path("id") Long id);
 
+
     @GET("/api/alerts/latitude/{latitude}/longitude/{longitude}/accepted-distance/{distance}")
     Call<ResponseMultipleData<Alert>> getAlertByDistance(@Path("latitude") Double latitude, @Path("longitude") Double longitude,
-                                                       @Path("distance") Double distance);
+                                                         @Path("distance") Double distance);
+
+    @PUT("/api/users/{id}/alerts")
+    Call<ResponseMultipleData<Alert>> getUserAlerts(@Path("id") Long id);
+
 }

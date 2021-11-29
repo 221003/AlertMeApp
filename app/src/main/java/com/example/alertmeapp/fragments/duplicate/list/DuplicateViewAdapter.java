@@ -28,7 +28,8 @@ import com.example.alertmeapp.api.requests.VoteRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
-import com.example.alertmeapp.fragments.alert.list.AlertItem;
+
+import com.example.alertmeapp.fragments.alert.AlertItem;
 import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 

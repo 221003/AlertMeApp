@@ -2,7 +2,7 @@ package com.example.alertmeapp.utils;
 
 import android.location.Location;
 
-import com.example.alertmeapp.fragments.alert.list.AlertItem;
+import com.example.alertmeapp.fragments.alert.AlertItem;
 
 import java.util.Comparator;
 

@@ -1,5 +1,6 @@
 package com.example.alertmeapp.fragments;
 
+
 import static android.app.Activity.RESULT_OK;
 
 
@@ -50,6 +51,7 @@ import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.common.util.ScopeUtil;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
@@ -84,7 +86,7 @@ public class AlertFormFragment extends Fragment {
     private final String INVALID_DESCRIPTION = "Description cannot be empty";
     private final String INVALID_LOCALIZATION = "Please enter the localization";
 
-    private EditText titleView;
+    private TextInputEditText titleView;
     private TextView titleInvalidView;
     private EditText descriptionView;
     private TextView descriptionInvalidView;
@@ -357,33 +359,28 @@ public class AlertFormFragment extends Fragment {
     }
 
     private boolean isNewAlertValid() {
-        boolean valid = true;
+        boolean isValidate = true;
         String title = titleView.getText().toString();
         String description = descriptionView.getText().toString();
         boolean titleValid = validateTitle(title);
         boolean descriptionValid = validateDescription(description);
-
         if (!titleValid) {
-            titleInvalidView.setText(INVALID_TITLE);
-            valid = false;
-        } else {
-            titleInvalidView.setText("");
+            isValidate = false;
+            titleView.setError(INVALID_TITLE);
         }
 
         if (!descriptionValid) {
-            descriptionInvalidView.setText(INVALID_DESCRIPTION);
-            valid = false;
-        } else {
-            descriptionInvalidView.setText("");
+            isValidate = false;
+            descriptionView.setError(INVALID_DESCRIPTION);
         }
+
 
         if (longitude == null || latitude == null || latitude == LOCATION_NOT_SET || longitude == LOCATION_NOT_SET) {
             localizationInvalid.setText(INVALID_LOCALIZATION);
-            valid = false;
-        } else {
-            localizationInvalid.setText("");
+            isValidate = false;
         }
-        return valid;
+
+        return isValidate;
     }
 
     public void onCheckDuplicates(View view) {
@@ -553,7 +550,7 @@ public class AlertFormFragment extends Fragment {
     }
 
     private void showUploadedPhoto() {
-        photoUploadInfoView.setVisibility(View.INVISIBLE);
+        //photoUploadInfoView.setVisibility(View.INVISIBLE);
         uploadedPhotoView.setVisibility(View.VISIBLE);
     }
 

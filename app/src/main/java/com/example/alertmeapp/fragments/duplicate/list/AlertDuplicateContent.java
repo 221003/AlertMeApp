@@ -12,8 +12,8 @@ import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
-import com.example.alertmeapp.fragments.alert.list.AlertItem;
-import com.example.alertmeapp.fragments.alert.list.MyListRecyclerViewAdapter;
+
+import com.example.alertmeapp.fragments.alert.AlertItem;
 import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.LoggedInUser;
 

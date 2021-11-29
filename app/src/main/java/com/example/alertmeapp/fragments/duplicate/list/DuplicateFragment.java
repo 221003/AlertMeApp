@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alertmeapp.R;
-import com.example.alertmeapp.fragments.alert.list.AlertItem;
+import com.example.alertmeapp.fragments.alert.AlertItem;
 import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.util.ArrayList;
