@@ -3,19 +3,13 @@ package com.example.alertmeapp.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
-import android.text.style.CharacterStyle;
-import android.text.style.ClickableSpan;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,13 +25,10 @@ import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.notifications.FirebaseMessageReceiver;
 import com.example.alertmeapp.utils.LoggedInUser;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
@@ -143,20 +134,7 @@ public class SignInActivity extends AppCompatActivity {
                                             locationResult.getLastLocation().getLatitude());
                                     changeActivityTo(MainActivity.class);
                                 } else {
-                                    try {
-                                        Gson gson = new Gson();
-                                        ResponseSingleData errorResponse = gson.fromJson(
-                                                response.errorBody().string(),
-                                                ResponseSingleData.class);
-                                        int errorCode = errorResponse.getErrorCode();
-                                        String errorMessage = errorResponse.getError();
-                                        if (errorCode == INCORRECT_LOGIN_CODE)
-                                            tilEmail.setError(errorMessage);
-                                        else if (errorCode == INCORRECT_PASSWORD_CODE)
-                                            tilPassword.setError(errorMessage);
-                                    } catch (IOException e) {
-                                        displayToast();
-                                    }
+                                    handleErrorLogIn(response);
                                 }
                             }
 
@@ -167,6 +145,23 @@ public class SignInActivity extends AppCompatActivity {
                         });
                     }
                 }, Looper.getMainLooper());
+    }
+
+    private void handleErrorLogIn(Response<ResponseSingleData<User>> response) {
+        try {
+            Gson gson = new Gson();
+            ResponseSingleData errorResponse = gson.fromJson(
+                    response.errorBody().string(),
+                    ResponseSingleData.class);
+            int errorCode = errorResponse.getErrorCode();
+            String errorMessage = errorResponse.getError();
+            if (errorCode == INCORRECT_LOGIN_CODE)
+                tilEmail.setError(errorMessage);
+            else if (errorCode == INCORRECT_PASSWORD_CODE)
+                tilPassword.setError(errorMessage);
+        } catch (IOException e) {
+            displayToast();
+        }
     }
 
     private boolean validateEmail(String email) {

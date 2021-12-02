@@ -66,7 +66,7 @@ public class DuplicateFragment extends Fragment {
                 getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         String alertDuplicateId = sharedPref.getString("alertDuplicateId", null);
         if (alertDuplicateId == null) {
-            System.out.println("jestem nullem PROBLEMMMM");
+            System.out.println("alert duplicate is null problem");
         }else{
             getActivity().getSupportFragmentManager().popBackStack();
         }

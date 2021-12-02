@@ -41,21 +41,18 @@ import androidx.navigation.Navigation;
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.activities.MapsActivity;
 import com.example.alertmeapp.api.data.Alert;
-import com.example.alertmeapp.api.data.Vote;
 import com.example.alertmeapp.api.requests.AlertRequest;
 import com.example.alertmeapp.api.requests.VoteRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
+import com.example.alertmeapp.api.retrofit.AlertMeServiceImpl;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.utils.LoggedInUser;
-import com.google.android.gms.common.util.ScopeUtil;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -105,12 +102,16 @@ public class AlertFormFragment extends Fragment {
             result -> processChosenPhoto(result));
 
     public static final float LOCATION_NOT_SET = -999f;
+    private final int NO_DUPLICATE_VALUE = -1;
 
     private Double longitude;
     private Double latitude;
     private String categoryItemName = null;
     private String imageByteArray;
+
     private final AlertMeService service = RestAdapter.getAlertMeService();
+    private AlertMeServiceImpl alertMeServiceImpl = new AlertMeServiceImpl();
+
     private List<AlertType> alertTypeRequests = new ArrayList<>();
 
     @Override
@@ -164,89 +165,71 @@ public class AlertFormFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getNewAlertCords();
-        if (imageByteArray == null) {
-            System.out.println("zdjeciaq nie ma");
-        } else {
-            System.out.println("zdjecie jest");
-        }
+
         if (getCreateAlert() != null || getAlertDuplicateId() != null) {
-            System.out.println("wpsolrzednie: " + longitude + " " + latitude);
-            String createAlert = getCreateAlert();
-            System.out.println("2: " + categoryItemName);
-            if (createAlert == null) {
-                System.out.println("jestem nullem create alert");
-            } else {
-                System.out.println("111trzeba dodac alert: " + createAlert);
-
-                String title = titleView.getText().toString();
-                String description = descriptionView.getText().toString();
-                AlertRequest alertRequest = new AlertRequest.Builder()
-                        .withUserId(LoggedInUser.getInstance(null, null, null).getId())
-                        .withAlertTypeId(getSelectedCategoryAlertType(categoryItemName).getId())
-                        .withDescription(description)
-                        .withTitle(title)
-                        .withLatitude(latitude)
-                        .withLongitude(longitude)
-                        .withNumberOfVotes(0)
-                        .withImage(imageByteArray)
-                        .build();
-                System.out.println(alertRequest);
-                requestToSaveAlert(alertRequest);
-
-                removeCreateAlert();
-            }
-
-            String alertDuplicateId = getAlertDuplicateId();
-            if (alertDuplicateId == null) {
-                System.out.println("jestem nullem alertDuplicateId");
-            } else if (alertDuplicateId.equals("-1")) {
-                System.out.println("222trzeba dodacnowy alert");
-
-                String title = titleView.getText().toString();
-                String description = descriptionView.getText().toString();
-                AlertRequest alertRequest = new AlertRequest.Builder()
-                        .withUserId(LoggedInUser.getInstance(null, null, null).getId())
-                        .withAlertTypeId(getSelectedCategoryAlertType(categoryItemName).getId())
-                        .withDescription(description)
-                        .withTitle(title)
-                        .withLatitude(latitude)
-                        .withLongitude(longitude)
-                        .withNumberOfVotes(0)
-                        .withImage(imageByteArray)
-                        .build();
-                System.out.println(alertRequest);
-                requestToSaveAlert(alertRequest);
-
-                removeAlertDuplicateId();
-            } else {
-                System.out.println(alertDuplicateId);
-                System.out.println("trzeba zlajkowac alert o id podanym");
-
-                createVote(new VoteRequest(Long.valueOf(alertDuplicateId), LoggedInUser.getLoggedUser().getId(), true));
-                AlertMeService service = RestAdapter.getAlertMeService();
-                Call<ResponseSingleData<Alert>> alert = service.getAlert(Long.valueOf(alertDuplicateId));
-                alert.enqueue(new Callback<ResponseSingleData<Alert>>() {
-                    @Override
-                    public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
-                        if (response.isSuccessful()) {
-                            Alert data = response.body().getData();
-                            data.setNumber_of_votes(data.getNumber_of_votes() + 1);
-                            updateAlert(data);
-
-                        } else {
-                            System.out.println("Unsuccessful to fetch alert");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
-                        System.out.println("Failed to fetch alert");
-                    }
-                });
-                removeAlertDuplicateId();
-            }
-            removeNewAlertCords();
+            handleDuplicate();
         }
+    }
+
+    private void handleDuplicate() {
+        String createAlert = getCreateAlert();
+        if (createAlert != null) {
+            AlertRequest alertRequest = createAlertRequestFromForm();
+            requestToSaveAlert(alertRequest);
+            removeCreateAlert();
+        }
+
+        String alertDuplicateId = getAlertDuplicateId();
+        if(alertDuplicateId!=null) {
+            if (alertDuplicateId.equals(String.valueOf(NO_DUPLICATE_VALUE))) {
+                AlertRequest alertRequest = createAlertRequestFromForm();
+                requestToSaveAlert(alertRequest);
+            } else {
+                incrementVoteCountOfAlert(alertDuplicateId);
+            }
+            removeAlertDuplicateId();
+        }
+        removeNewAlertCords();
+    }
+
+    private void incrementVoteCountOfAlert(String alertDuplicateId) {
+        alertMeServiceImpl.createVote(new VoteRequest(Long.valueOf(alertDuplicateId), LoggedInUser.getLoggedUser().getId(), true));
+        AlertMeService service = RestAdapter.getAlertMeService();
+        Call<ResponseSingleData<Alert>> alert = service.getAlert(Long.valueOf(alertDuplicateId));
+        alert.enqueue(new Callback<ResponseSingleData<Alert>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
+                if (response.isSuccessful()) {
+                    Alert data = response.body().getData();
+                    data.setNumber_of_votes(data.getNumber_of_votes() + 1);
+                    updateAlert(data);
+
+                } else {
+                    System.out.println("Unsuccessful to fetch alert");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
+                System.out.println("Failed to fetch alert");
+            }
+        });
+    }
+
+    private AlertRequest createAlertRequestFromForm() {
+        String title = titleView.getText().toString();
+        String description = descriptionView.getText().toString();
+        AlertRequest alertRequest = new AlertRequest.Builder()
+                .withUserId(LoggedInUser.getInstance(null, null, null).getId())
+                .withAlertTypeId(getSelectedCategoryAlertType(categoryItemName).getId())
+                .withDescription(description)
+                .withTitle(title)
+                .withLatitude(latitude)
+                .withLongitude(longitude)
+                .withNumberOfVotes(0)
+                .withImage(imageByteArray)
+                .build();
+        return alertRequest;
     }
 
     private void updateAlert(Alert alert) {
@@ -260,17 +243,14 @@ public class AlertFormFragment extends Fragment {
                 .withNumberOfVotes(alert.getNumber_of_votes())
                 .withUserId(alert.getUser().getId())
                 .build();
-        System.out.println(alertRequest);
+
         Call<ResponseSingleData<Alert>> call = service.updateAlert(alertRequest, alert.getId());
         call.enqueue(new Callback<ResponseSingleData<Alert>>() {
             @Override
             public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
-                System.out.println("REQUEST OK");
-                System.out.println(response.code());
                 NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
                 navController.navigate(R.id.mapsFragment);
                 displayToast("Added like to alert");
-
             }
 
             @Override
@@ -279,50 +259,6 @@ public class AlertFormFragment extends Fragment {
         });
     }
 
-    private void createVote(VoteRequest voteRequest) {
-        Call<ResponseSingleData<Vote>> call = service.createVote(voteRequest);
-        System.out.println(voteRequest);
-        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                System.out.println("REQUEST CODE");
-                System.out.println(response.code());
-                if (!response.isSuccessful()) {
-                    Gson gson = new Gson();
-                    try {
-                        ResponseSingleData errorResponse = gson.fromJson(
-                                response.errorBody().string(),
-                                ResponseSingleData.class);
-                        int existingId = errorResponse.getErrorCode();
-                        updateVote(voteRequest, (long) existingId);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
-            }
-        });
-    }
-
-    private void updateVote(VoteRequest voteRequest, Long id) {
-        Call<ResponseSingleData<Vote>> call = service.updateVote(voteRequest, id);
-        System.out.println(voteRequest);
-        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                System.out.println("REQUEST CODE");
-                System.out.println(response.code());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
-            }
-        });
-    }
 
     private void populateCategorySpinner() {
         List<String> categories = new ArrayList<>(5);
@@ -364,6 +300,7 @@ public class AlertFormFragment extends Fragment {
         String description = descriptionView.getText().toString();
         boolean titleValid = validateTitle(title);
         boolean descriptionValid = validateDescription(description);
+
         if (!titleValid) {
             isValidate = false;
             titleView.setError(INVALID_TITLE);
@@ -374,7 +311,6 @@ public class AlertFormFragment extends Fragment {
             descriptionView.setError(INVALID_DESCRIPTION);
         }
 
-
         if (longitude == null || latitude == null || latitude == LOCATION_NOT_SET || longitude == LOCATION_NOT_SET) {
             localizationInvalid.setText(INVALID_LOCALIZATION);
             isValidate = false;
@@ -384,7 +320,6 @@ public class AlertFormFragment extends Fragment {
     }
 
     public void onCheckDuplicates(View view) {
-
         if (isNewAlertValid()) {
             Bundle bundle = new Bundle();
             String category = categorySpinner.getSelectedItem().toString();
@@ -394,50 +329,7 @@ public class AlertFormFragment extends Fragment {
                     ? alertTypeRequests.get(0).getName() : getSelectedCategoryAlertType(category).getName());
             NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
             navController.navigate(R.id.duplicateFragment, bundle);
-        } else {
-            System.out.println("nie ustawiels lokalizacji byczqu");
         }
-
-//        String title = titleView.getText().toString();
-//        String description = descriptionView.getText().toString();
-//        String category = categorySpinner.getSelectedItem().toString();
-//        boolean titleValid = validateTitle(title);
-//        boolean descriptionValid = validateDescription(description);
-//
-//        if (!titleValid) {
-//            titleInvalidView.setText(INVALID_TITLE);
-//        } else {
-//            titleInvalidView.setText("");
-//        }
-//
-//        if (!descriptionValid) {
-//            titleInvalidView.setText(INVALID_TITLE);
-//            descriptionInvalidView.setText(INVALID_DESCRIPTION);
-//        } else {
-//            descriptionInvalidView.setText("");
-//        }
-//
-//        if (longitude == null || latitude == null) {
-//            localizationInvalid.setText(INVALID_LOCALIZATION);
-//        } else {
-//            localizationInvalid.setText("");
-//        }
-//
-//        if (titleValid && descriptionValid && longitude != null && latitude != null) {
-//            AlertRequest alertRequest = new AlertRequest.Builder()
-//                    .withUserId(LoggedInUser.getInstance(null,null,null).getId())
-//                    .withAlertTypeId(getSelectedCategoryAlertType(category).getId())
-//                    .withDescription(description)
-//                    .withTitle(title)
-//                    .withLatitude(latitude)
-//                    .withLongitude(longitude)
-//                    .withNumberOfVotes(0)
-//                    .withImage(getUploadedPhotoBytesArray())
-//                    .build();
-//            requestToSaveAlert(alertRequest);
-//            requestToSaveAlert(new AlertRequest(Long.valueOf(LoggedInUser.getInstance(null,null,null).getId()), Long.valueOf(getSelectedCategoryAlertType(category).getId())
-//                    , title, description, 0, latitude, longitude, getCurrentDate(), getUploadedPhotoBytesArray()));
-//        }
     }
 
     private void requestToSaveAlert(AlertRequest alertRequest) {

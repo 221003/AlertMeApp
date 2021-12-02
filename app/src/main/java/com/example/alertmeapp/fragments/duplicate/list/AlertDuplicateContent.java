@@ -29,7 +29,7 @@ public class AlertDuplicateContent {
     private final RecyclerView recyclerView;
     private final List<AlertItem> items;
 
-    private final Integer RANGE_OF_DUPLICATE_ALERTS_IN_METERS = 12000;
+    private final Integer RANGE_OF_DUPLICATE_ALERTS_IN_METERS = 2000;
     private final Double latitude;
     private final Double longitude;
     private final String alertName;
@@ -44,11 +44,11 @@ public class AlertDuplicateContent {
         this.adapter = adapter;
         this.items = items;
         this.recyclerView = recyclerView;
-        getAlertWithCategory(alertName);
+        getAlertWithCategoryAndFillViewWithIt(alertName);
 
     }
 
-    private void getAlertWithCategory(String alertName) {
+    private void getAlertWithCategoryAndFillViewWithIt(String alertName) {
         AlertMeService service = RestAdapter.getAlertMeService();
         Call<ResponseMultipleData<Alert>> allAlerts = service.getAlertByDistance(latitude, longitude, Double.valueOf(RANGE_OF_DUPLICATE_ALERTS_IN_METERS));
         allAlerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
@@ -56,30 +56,9 @@ public class AlertDuplicateContent {
             @Override
             public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
                 if (response.isSuccessful()) {
-                    List<Alert> alerts = response.body().getData();
-                    List<AlertItem> temp = new ArrayList<>();
-
-                    alerts.stream()
-                            .filter((alert -> alert.getAlertType().getName().equals(alertName)))
-                            .forEach(alert -> temp.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude()))));
-
-                    if (items.size() != temp.size()) {
-                        items.clear();
-                        items.addAll(temp);
-                    }
-                    items.sort(new DistanceComparator());
-                    adapter.notifyDataSetChanged();
-                    recyclerView.setAdapter(adapter);
-
+                    filterList(response, alertName);
                     if (items.size() == 0) {
-                        Context applicationContext = fragmentActivity.getApplicationContext();
-                        SharedPreferences sharedPref = applicationContext.getSharedPreferences(
-                                applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("createAlert", "yes");
-                        editor.apply();
-                        fragmentActivity.getSupportFragmentManager().popBackStack();
+                        handleNoDuplicates();
                     }
                 } else {
                     System.out.println("Unsuccessful to fetch all alerts AlertContent.class");
@@ -91,6 +70,34 @@ public class AlertDuplicateContent {
                 System.out.println("Failed to fetch all alerts AlertContent.class");
             }
         });
+    }
+
+    private void handleNoDuplicates() {
+        Context applicationContext = fragmentActivity.getApplicationContext();
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(
+                applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("createAlert", "yes");
+        editor.apply();
+        fragmentActivity.getSupportFragmentManager().popBackStack();
+    }
+
+    private void filterList(Response<ResponseMultipleData<Alert>> response, String alertType) {
+        List<Alert> alerts = response.body().getData();
+        List<AlertItem> temp = new ArrayList<>();
+
+        alerts.stream()
+                .filter((alert -> alert.getAlertType().getName().equals(alertType)))
+                .forEach(alert -> temp.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude()))));
+
+        if (items.size() != temp.size()) {
+            items.clear();
+            items.addAll(temp);
+        }
+        items.sort(new DistanceComparator());
+        adapter.notifyDataSetChanged();
+        recyclerView.setAdapter(adapter);
     }
 
     private String countDistance(double longitude, double latitude) {

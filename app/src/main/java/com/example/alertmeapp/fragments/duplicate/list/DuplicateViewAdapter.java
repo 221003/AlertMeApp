@@ -70,7 +70,6 @@ public class DuplicateViewAdapter extends RecyclerView.Adapter<DuplicateViewAdap
     @Override
     public void onBindViewHolder(final DuplicateViewAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
-
         Context applicationContext = activity.getApplicationContext();
         SharedPreferences sharedPref = applicationContext.getSharedPreferences(
                 applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
@@ -78,7 +77,6 @@ public class DuplicateViewAdapter extends RecyclerView.Adapter<DuplicateViewAdap
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("alertDuplicateId", String.valueOf(NO_DUPLICATE_VALUE));
         editor.apply();
-
 
         Alert alert = alertList.get(position).getAlert();
         String distance = alertList.get(position).getDistance();
@@ -88,7 +86,6 @@ public class DuplicateViewAdapter extends RecyclerView.Adapter<DuplicateViewAdap
         holder.rangeView.setText(distance);
         int color = getColorBasedOnAlertType(alert.getAlertType().getName());
         holder.materialCardView.setStrokeColor(color);
-        findVote(new VoteRequest(alert.getId(), USER_ID), holder);
 
         holder.radioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,94 +140,6 @@ public class DuplicateViewAdapter extends RecyclerView.Adapter<DuplicateViewAdap
                 break;
         }
         return color;
-    }
-
-    private void updateAlert(Alert alert) {
-        AlertRequest alertRequest = new AlertRequest.Builder()
-                .withAlertTypeId(alert.getAlertType().getId())
-                .withDescription(alert.getDescription())
-                .withLatitude(alert.getLatitude())
-                .withLongitude(alert.getLongitude())
-                .withImage(alert.getImage())
-                .withTitle(alert.getTitle())
-                .withNumberOfVotes(alert.getNumber_of_votes())
-                .withUserId(alert.getUser().getId())
-                .build();
-        System.out.println(alertRequest);
-        Call<ResponseSingleData<Alert>> call = service.updateAlert(alertRequest, alert.getId());
-        call.enqueue(new Callback<ResponseSingleData<Alert>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
-                System.out.println("REQUEST OK");
-                System.out.println(response.code());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
-            }
-        });
-    }
-
-    private void createVote(VoteRequest voteRequest) {
-        Call<ResponseSingleData<Vote>> call = service.createVote(voteRequest);
-        System.out.println(voteRequest);
-        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                System.out.println("REQUEST CODE");
-                System.out.println(response.code());
-                if (!response.isSuccessful()) {
-                    Gson gson = new Gson();
-                    try {
-                        ResponseSingleData errorResponse = gson.fromJson(
-                                response.errorBody().string(),
-                                ResponseSingleData.class);
-                        int existingId = errorResponse.getErrorCode();
-                        updateVote(voteRequest, (long) existingId);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
-            }
-        });
-    }
-
-    private void updateVote(VoteRequest voteRequest, Long id) {
-        Call<ResponseSingleData<Vote>> call = service.updateVote(voteRequest, id);
-        System.out.println(voteRequest);
-        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                System.out.println("REQUEST CODE");
-                System.out.println(response.code());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
-            }
-        });
-    }
-
-    private void findVote(VoteRequest voteRequest, DuplicateViewAdapter.ViewHolder holder) {
-        Call<ResponseSingleData<Vote>> call = service.findVote(voteRequest);
-        call.enqueue(new Callback<ResponseSingleData<Vote>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                // System.out.println("FIND VOTE CODE");
-                System.out.println(response.code());
-                if (response.body() != null)
-                    System.out.println("is upped" + response.body());
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Vote>> call, Throwable t) {
-            }
-        });
     }
 
     @Override

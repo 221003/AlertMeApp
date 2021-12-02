@@ -62,21 +62,7 @@ public abstract class ListFragmentAbstract extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 if (spinnerFirstTrigger) {
-                    String category = categorySpinner.getSelectedItem().toString();
-                    System.out.println("wchodze do psinner onitemseleceted");
-                    if (!category.equals("all")) {
-                        List<AlertItem> copyList = new ArrayList<>();
-                        for (int i = 0; i < items.size(); i++) {
-                            if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
-                                copyList.add(items.get(i));
-                            }
-                        }
-                        copyList.sort(new DistanceComparator());
-                        adapter = new MyListRecyclerViewAdapter(getActivity(), copyList);
-                    } else {
-                        adapter = new MyListRecyclerViewAdapter(getActivity(), items);
-                    }
-                    recyclerView.setAdapter(adapter);
+                    filterAlertListBasedOnCategory();
                 } else {
                     spinnerFirstTrigger = true;
                 }
@@ -98,6 +84,23 @@ public abstract class ListFragmentAbstract extends Fragment {
         new AlertContent(recyclerView, adapter, items, myAlerts);
 
         return view;
+    }
+
+    private void filterAlertListBasedOnCategory() {
+        String category = categorySpinner.getSelectedItem().toString();
+        if (!category.equals("all")) {
+            List<AlertItem> copyList = new ArrayList<>();
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
+                    copyList.add(items.get(i));
+                }
+            }
+            copyList.sort(new DistanceComparator());
+            adapter = new MyListRecyclerViewAdapter(getActivity(), copyList);
+        } else {
+            adapter = new MyListRecyclerViewAdapter(getActivity(), items);
+        }
+        recyclerView.setAdapter(adapter);
     }
 
     private void populateCategorySpinner() {
