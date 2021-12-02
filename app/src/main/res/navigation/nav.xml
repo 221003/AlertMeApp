@@ -6,7 +6,7 @@
     app:startDestination="@id/mapsFragment">
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.example.alertmeapp.fragments.MapsFragment"
+        android:name="com.example.alertmeapp.fragments.mapFragment.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
     <fragment

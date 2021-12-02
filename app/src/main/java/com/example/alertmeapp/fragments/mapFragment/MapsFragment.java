@@ -1,4 +1,4 @@
-package com.example.alertmeapp.fragments;
+package com.example.alertmeapp.fragments.mapFragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
