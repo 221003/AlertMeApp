@@ -1,7 +1,13 @@
 package com.example.alertmeapp.api.data;
 
 
-public class Alert {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
+public class Alert implements ClusterItem {
 
     protected Long id;
     protected String title;
@@ -45,8 +51,20 @@ public class Alert {
         this.id = id;
     }
 
+    @NonNull
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(latitude,longitude);
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    @Nullable
+    @Override
+    public String getSnippet() {
+        return null;
     }
 
     public void setTitle(String title) {
