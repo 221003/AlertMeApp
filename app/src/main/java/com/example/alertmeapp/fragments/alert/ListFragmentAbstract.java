@@ -11,6 +11,7 @@ import android.widget.Spinner;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.data.AlertType;
@@ -75,12 +76,21 @@ public abstract class ListFragmentAbstract extends Fragment {
         });
         populateCategorySpinner();
 
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.refreshLayout);
+
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new MyListRecyclerViewAdapter(getActivity(), items);
         recyclerView.setAdapter(adapter);
 
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(false);
+                new AlertContent(recyclerView, adapter, items, myAlerts);
+            }
+        });
         new AlertContent(recyclerView, adapter, items, myAlerts);
 
         return view;
