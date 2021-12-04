@@ -18,6 +18,7 @@ import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.User;
 import com.example.alertmeapp.api.requests.UserSignUpRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
+import com.example.alertmeapp.utils.FactoryAnimation;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -53,23 +54,28 @@ public class SignUpActivity extends AppCompatActivity {
         tilSummaryErrors = findViewById(R.id.til_summary_errors);
         textHaveAcc.setOnClickListener(v -> changeActivityTo(SignInActivity.class));
 
-        signUp.setOnClickListener(v->{
-            //TODO handle returned JSON message from server -> display message
-            if(handleInputErrors()){
-                AlertMeService service = RestAdapter.getAlertMeService();
-                UserSignUpRequest userSignUpRequest = createSignUpBody();
-                Call<ResponseSingleData<User>> call = service.signUp(userSignUpRequest);
-                call.enqueue(new Callback<ResponseSingleData<User>>() {
-                    @Override
-                    public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
-                        if(response.isSuccessful())
-                            changeActivityTo(MainActivity.class);
-                    }
-                    @Override
-                    public void onFailure(Call<ResponseSingleData<User>> call, Throwable t) {
-                        displayToast("Error occurred");
-                    }
-                });
+        signUp.setOnClickListener(v -> {
+            signUp.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            if (validateInputErrors()) {
+                requestToCreateNewUser();
+            }
+        });
+    }
+
+    private void requestToCreateNewUser() {
+        AlertMeService service = RestAdapter.getAlertMeService();
+        UserSignUpRequest userSignUpRequest = createSignUpBody();
+        Call<ResponseSingleData<User>> call = service.signUp(userSignUpRequest);
+        call.enqueue(new Callback<ResponseSingleData<User>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
+                if (response.isSuccessful())
+                    changeActivityTo(MainActivity.class);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<User>> call, Throwable t) {
+                displayToast("Error occurred");
             }
         });
     }
@@ -112,20 +118,20 @@ public class SignUpActivity extends AppCompatActivity {
         return Optional.empty();
     }
 
-    private Optional<String> handleInputEmail(){
+    private Optional<String> handleInputEmail() {
         String email = tilEmail.getEditText().getText().toString();
-        if(Patterns.EMAIL_ADDRESS.matcher(email).matches() || TextUtils.isEmpty(email))
+        if (Patterns.EMAIL_ADDRESS.matcher(email).matches() || TextUtils.isEmpty(email))
             return Optional.empty();
         tilEmail.setErrorEnabled(true);
         tilEmail.setError(" ");
         return Optional.of("incorrect email");
     }
 
-    private Optional<String> handleInputPasswords(){
+    private Optional<String> handleInputPasswords() {
         String passwordStr = tilPassword.getEditText().getText().toString();
         String repeatedPasswordStr = tilRepeatedPassword.getEditText().getText().toString();
         if (!TextUtils.isEmpty(passwordStr) && !TextUtils.isEmpty(repeatedPasswordStr)) {
-            if (!repeatedPasswordStr.equals(passwordStr)){
+            if (!repeatedPasswordStr.equals(passwordStr)) {
                 tilRepeatedPassword.setErrorEnabled(true);
                 tilRepeatedPassword.setError(" ");
                 return Optional.of("passwords must be the same");
@@ -134,13 +140,13 @@ public class SignUpActivity extends AppCompatActivity {
         return Optional.empty();
     }
 
-    private void displayErrorMessage(List<String> errorMessages){
+    private void displayErrorMessage(List<String> errorMessages) {
         tilSummaryErrors.setErrorEnabled(true);
         tilSummaryErrors.setError(buildOutputMessage(errorMessages));
     }
 
 
-    private boolean handleInputErrors() {
+    private boolean validateInputErrors() {
         cleanErrors();
         List<String> errorMessages = new ArrayList<>();
         handleEmptyField(tilEmail).ifPresent(errorMessages::add);

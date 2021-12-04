@@ -20,6 +20,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,6 +50,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeServiceImpl;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.utils.FactoryAnimation;
 import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -123,11 +125,25 @@ public class AlertFormFragment extends Fragment {
         Button buttonUploader = view.findViewById(R.id.upload_form);
         Button buttonPhotoChooser = view.findViewById(R.id.choose_photo_button);
         Button buttonLocalization = view.findViewById(R.id.enter_localization);
+        buttonPhoto.setOnClickListener(v -> {
+            buttonPhoto.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            onTakePhotoClick(v);
+        });
 
-        buttonPhoto.setOnClickListener(this::onTakePhotoClick);
-        buttonUploader.setOnClickListener(this::onCheckDuplicates);
-        buttonPhotoChooser.setOnClickListener(this::onChoosePhotoClick);
-        buttonLocalization.setOnClickListener(this::onChooseLocalization);
+        buttonUploader.setOnClickListener(v -> {
+            buttonUploader.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            onCheckDuplicates(v);
+        });
+
+        buttonPhotoChooser.setOnClickListener(v -> {
+            buttonPhotoChooser.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            onChoosePhotoClick(v);
+        });
+
+        buttonLocalization.setOnClickListener(v -> {
+            buttonLocalization.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            onChooseLocalization(v);
+        });
 
         categorySpinner = view.findViewById(R.id.alert_form_category);
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -180,7 +196,7 @@ public class AlertFormFragment extends Fragment {
         }
 
         String alertDuplicateId = getAlertDuplicateId();
-        if(alertDuplicateId!=null) {
+        if (alertDuplicateId != null) {
             if (alertDuplicateId.equals(String.valueOf(NO_DUPLICATE_VALUE))) {
                 AlertRequest alertRequest = createAlertRequestFromForm();
                 requestToSaveAlert(alertRequest);

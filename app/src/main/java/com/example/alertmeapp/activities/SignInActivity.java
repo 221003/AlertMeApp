@@ -1,6 +1,7 @@
 package com.example.alertmeapp.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -9,7 +10,13 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.util.Patterns;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +31,7 @@ import com.example.alertmeapp.api.requests.UserSignInRequest;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.notifications.FirebaseMessageReceiver;
+import com.example.alertmeapp.utils.FactoryAnimation;
 import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -52,6 +60,8 @@ public class SignInActivity extends AppCompatActivity {
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
     private TextView linkToSignUpActivity;
+    private Button signInButton;
+
     private final AlertMeService service = RestAdapter.getAlertMeService();
 
 
@@ -61,6 +71,7 @@ public class SignInActivity extends AppCompatActivity {
     };
     private static final int REQUEST_LOCATION_CODE = 103;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,13 +80,19 @@ public class SignInActivity extends AppCompatActivity {
         tilEmail = findViewById(R.id.til_email);
         tilPassword = findViewById(R.id.til_password);
         linkToSignUpActivity = findViewById(R.id.text_have_acc);
+        signInButton = findViewById(R.id.sign_in_button);
 
+        signInButton.setOnClickListener(v -> {
+            signInButton.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            onSignInClick();
+        });
         SpannableString str = new SpannableString(linkToSignUpActivity.getText().toString());
         str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
                 INT_START, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         linkToSignUpActivity.setText(str);
         linkToSignUpActivity.setMovementMethod(LinkMovementMethod.getInstance());
         linkToSignUpActivity.setOnClickListener(v -> changeActivityTo(SignUpActivity.class));
+
     }
 
 
@@ -88,7 +105,7 @@ public class SignInActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
     }
 
-    public void onSignInClick(View view) {
+    public void onSignInClick() {
         tilEmail.setError("");
         tilPassword.setError("");
         String email = tilEmail.getEditText().getText().toString();

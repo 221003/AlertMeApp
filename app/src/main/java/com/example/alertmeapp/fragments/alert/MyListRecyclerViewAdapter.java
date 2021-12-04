@@ -28,6 +28,8 @@ import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -76,18 +78,17 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.upvote.setColorFilter(GRAY);
         holder.downvote.setColorFilter(GRAY);
         findVote(new VoteRequest(alert.getId(), USER_ID), holder);
-
-        holder.titleView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putLong("alertId", alert.getId());
-                NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
-                navController.navigate(R.id.alertDetailsFragment, bundle);
-            }
-        });
+        holder.titleView.setOnClickListener(v -> openAlertDetails(alert.getId(), holder.titleView));
         holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
         holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
+    }
+
+    private void openAlertDetails(long id, TextView titleView) {
+        titleView.requestFocus();
+        Bundle bundle = new Bundle();
+        bundle.putLong("alertId", id);
+        NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
+        navController.navigate(R.id.alertDetailsFragment, bundle);
     }
 
     private int getColorBasedOnAlertType(String alertType) {
@@ -156,10 +157,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         call.enqueue(new Callback<ResponseSingleData<Vote>>() {
             @Override
             public void onResponse(Call<ResponseSingleData<Vote>> call, Response<ResponseSingleData<Vote>> response) {
-                // System.out.println("FIND VOTE CODE");
-                System.out.println(response.code());
-                if (response.body() != null)
-                    System.out.println("is upped" + response.body());
                 if (response.body() == null) {
                     holder.upvote.setColorFilter(GRAY);
                     holder.downvote.setColorFilter(GRAY);
