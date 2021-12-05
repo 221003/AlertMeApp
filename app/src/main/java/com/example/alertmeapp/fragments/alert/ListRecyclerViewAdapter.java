@@ -32,12 +32,13 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.Iterator;
 import java.util.List;
 
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
+public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerViewAdapter.ViewHolder> {
 
     private final FragmentActivity activity;
     private List<AlertItem> alertList;
@@ -47,21 +48,13 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     private final AlertMeService service = RestAdapter.getAlertMeService();
     private AlertMeServiceImpl alertMeServiceImpl = new AlertMeServiceImpl();
     private final long USER_ID = LoggedInUser.getLoggedUser().getId();
-    private ViewHolder holder;
 
 
-    public MyListRecyclerViewAdapter(FragmentActivity activity, List<AlertItem> items) {
-        this.alertList = items;
+    public ListRecyclerViewAdapter(FragmentActivity activity, List<AlertItem> items) {
         this.activity = activity;
+        this.alertList = items;
     }
 
-    public void setAlertList(List<AlertItem> alertList) {
-        this.alertList = alertList;
-    }
-
-    public List<AlertItem> getAlertList() {
-        return alertList;
-    }
 
     @NonNull
     @Override
@@ -73,7 +66,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        this.holder = holder;
         Alert alert = alertList.get(position).getAlert();
         String distance = alertList.get(position).getDistance();
 

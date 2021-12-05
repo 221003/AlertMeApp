@@ -5,7 +5,6 @@ import com.example.alertmeapp.api.data.Vote;
 import com.example.alertmeapp.api.requests.AlertRequest;
 import com.example.alertmeapp.api.requests.VoteRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
-import com.example.alertmeapp.fragments.alert.MyListRecyclerViewAdapter;
 import com.google.gson.Gson;
 
 import java.io.IOException;

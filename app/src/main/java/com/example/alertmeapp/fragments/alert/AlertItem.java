@@ -40,4 +40,12 @@ public class AlertItem {
     public int hashCode() {
         return alert.getId().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "AlertItem{" +
+                "alert=" + alert +
+                ", distance='" + distance + '\'' +
+                '}';
+    }
 }

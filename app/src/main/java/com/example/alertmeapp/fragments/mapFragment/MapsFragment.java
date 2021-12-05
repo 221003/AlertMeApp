@@ -57,7 +57,7 @@ public class MapsFragment extends Fragment {
         clusterManager.setRenderer(new CustomMapClusterRenderer<>(getContext(), map, clusterManager));
         clusterManager.setOnClusterItemClickListener(marker -> {
             Bundle bundle = new Bundle();
-            bundle.putLong("alertId", marker.getId());
+            bundle.putSerializable("alert", marker);
             NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
             navController.navigate(R.id.alertDetailsFragment, bundle);
             return false;

@@ -7,7 +7,9 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class Alert implements ClusterItem {
+import java.io.Serializable;
+
+public class Alert implements ClusterItem, Serializable {
 
     protected Long id;
     protected String title;

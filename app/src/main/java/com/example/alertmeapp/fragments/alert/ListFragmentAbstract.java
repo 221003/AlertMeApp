@@ -14,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.alertmeapp.R;
+import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.utils.DistanceCalculatorFromUser;
 import com.example.alertmeapp.utils.DistanceComparator;
+import com.example.alertmeapp.utils.LoggedInUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +39,7 @@ public abstract class ListFragmentAbstract extends Fragment {
 
     protected RecyclerView recyclerView;
     protected List<AlertItem> items = new ArrayList<>();
-    protected MyListRecyclerViewAdapter adapter;
+    protected ListRecyclerViewAdapter adapter;
 
     protected Spinner categorySpinner;
     protected final AlertMeService service = RestAdapter.getAlertMeService();
@@ -63,7 +66,7 @@ public abstract class ListFragmentAbstract extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 if (spinnerFirstTrigger) {
-                    filterAlertListBasedOnCategory();
+                    filterAlertListBasedOnCategory(categorySpinner.getSelectedItem().toString());
                 } else {
                     spinnerFirstTrigger = true;
                 }
@@ -75,41 +78,65 @@ public abstract class ListFragmentAbstract extends Fragment {
 
         });
         populateCategorySpinner();
-
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.refreshLayout);
-
-        recyclerView = (RecyclerView) view.findViewById(R.id.list);
+        recyclerView = view.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        adapter = new MyListRecyclerViewAdapter(getActivity(), items);
-        recyclerView.setAdapter(adapter);
-
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshLayout.setRefreshing(false);
-                new AlertContent(recyclerView, adapter, items, myAlerts);
-            }
+        getAlerts();
+        refreshLayout.setOnRefreshListener(() -> {
+            refreshLayout.setRefreshing(false);
+            getAlerts();
         });
-        new AlertContent(recyclerView, adapter, items, myAlerts);
 
         return view;
     }
 
-    private void filterAlertListBasedOnCategory() {
-        String category = categorySpinner.getSelectedItem().toString();
-        if (!category.equals("all")) {
-            List<AlertItem> copyList = new ArrayList<>();
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
-                    copyList.add(items.get(i));
+    private void getAlerts() {
+        AlertMeService service = RestAdapter.getAlertMeService();
+        Call<ResponseMultipleData<Alert>> alerts;
+        if (myAlerts) {
+            alerts = service.getUserAlerts(LoggedInUser.getInstance(null, null, null).getId());
+        } else {
+            alerts = service.getAllAlerts();
+        }
+        alerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
+
+            @Override
+            public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Alert> alerts = response.body().getData();
+                    items.clear();
+                    alerts.forEach(alert -> {
+                        items.add(new AlertItem(alert, DistanceCalculatorFromUser.count(alert.getLongitude(), alert.getLatitude())));
+                    });
+                    items.sort(new DistanceComparator());
+                    adapter = new ListRecyclerViewAdapter(getActivity(), items);
+                    recyclerView.setAdapter(adapter);
+                    filterAlertListBasedOnCategory(categorySpinner.getSelectedItem().toString());
+                    adapter.notifyDataSetChanged();
+                } else {
+                    System.out.println("Unsuccessful to fetch all alerts AlertContent.class");
                 }
             }
-            copyList.sort(new DistanceComparator());
-            adapter = new MyListRecyclerViewAdapter(getActivity(), copyList);
-        } else {
-            adapter = new MyListRecyclerViewAdapter(getActivity(), items);
+
+            @Override
+            public void onFailure(Call<ResponseMultipleData<Alert>> call, Throwable t) {
+                System.out.println("Failed to fetch all alerts AlertContent.class");
+            }
+        });
+    }
+
+    private void filterAlertListBasedOnCategory(String category) {
+        List<AlertItem> filteredList = items;
+        if (!category.equals("all")) {
+            filteredList = new ArrayList<>();
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getAlert().getAlertType().getName().equals(category)) {
+                    filteredList.add(items.get(i));
+                }
+            }
+            filteredList.sort(new DistanceComparator());
         }
+        adapter = new ListRecyclerViewAdapter(getActivity(), filteredList);
         recyclerView.setAdapter(adapter);
     }
 

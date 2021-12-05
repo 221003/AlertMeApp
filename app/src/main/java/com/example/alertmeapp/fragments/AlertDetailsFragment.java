@@ -68,24 +68,7 @@ public class AlertDetailsFragment extends Fragment {
         });
 
         Bundle args = getArguments();
-        long alertId = args.getLong("alertId");
-        AlertMeService service = RestAdapter.getAlertMeService();
-        Call<ResponseSingleData<Alert>> alert = service.getAlert(alertId);
-        alert.enqueue(new Callback<ResponseSingleData<Alert>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
-                if (response.isSuccessful()) {
-                    populateFragmentView(response.body().getData());
-                } else {
-                    System.out.println("Unsuccessful to fetch alert");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
-                System.out.println("Failed to fetch alert");
-            }
-        });
+        populateFragmentView((Alert) args.getSerializable("alert"));
     }
 
     private void populateFragmentView(Alert alert) {
