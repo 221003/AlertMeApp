@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <TextView
         android:id="@+id/sign_in_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="@string/sign_up"
+        android:layout_marginTop="148dp"
+        android:text="AlertMe"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,12 +19,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="32dp"
         android:contentDescription="@string/alertme_logo"
         android:minWidth="110dp"
         android:minHeight="110dp"
@@ -35,82 +34,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/first_name_input"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"-->
-    <!--        android:layout_width="300dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="5dp"-->
-    <!--        android:hint="@string/first_name"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/til_email"-->
-    <!--        tools:ignore="MissingConstraints"/>-->
-
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content" />-->
-
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
-
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/last_name_input"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"-->
-    <!--        android:layout_width="300dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="5dp"-->
-    <!--        android:hint="@string/last_name"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/first_name_input"-->
-    <!--        tools:ignore="MissingConstraints">-->
-
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content" />-->
-
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
-
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/first_password_input"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"-->
-    <!--        android:layout_width="300dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="5dp"-->
-    <!--        android:hint="@string/password"-->
-    <!--        app:endIconMode="password_toggle"-->
-    <!--        app:endIconTint="@color/purple_500"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/last_name_input"-->
-    <!--        tools:ignore="MissingConstraints">-->
-
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content" />-->
-
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
-
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/second_password_input"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"-->
-    <!--        android:layout_width="300dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="5dp"-->
-    <!--        android:hint="@string/repeat_password"-->
-    <!--        app:endIconMode="password_toggle"-->
-    <!--        app:endIconTint="@color/purple_500"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/first_password_input"-->
-    <!--        tools:ignore="MissingConstraints">-->
-
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content" />-->
-
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_email"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
@@ -120,18 +43,17 @@
         android:hint="@string/email_hint"
         android:padding="0dp"
         app:endIconTint="@color/black"
+        app:errorIconDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:errorIconDrawable="@null"
         tools:ignore="MissingConstraints">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/email_input"
-            android:textSize="18sp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -144,17 +66,17 @@
         android:hint="@string/first_name"
         android:padding="0dp"
         app:endIconTint="@color/black"
+        app:errorIconDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:errorIconDrawable="@null"
         tools:ignore="MissingConstraints">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:textSize="18sp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -168,20 +90,19 @@
         android:hint="@string/last_name"
         android:padding="0dp"
         app:endIconTint="@color/black"
+        app:errorIconDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:errorIconDrawable="@null"
         tools:ignore="MissingConstraints">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:textSize="18sp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -192,20 +113,19 @@
         android:layout_marginTop="400dp"
         android:hint="@string/password"
         android:padding="0dp"
-        app:endIconMode="password_toggle"
         app:endIconTint="@color/purple_500"
+        app:errorIconDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:errorIconDrawable="@null"
         tools:ignore="MissingConstraints">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:textSize="18sp"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:layout_height="wrap_content" />
+            android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -217,20 +137,19 @@
         android:layout_marginTop="460dp"
         android:hint="@string/repeat_password"
         android:padding="0dp"
-        app:endIconMode="password_toggle"
         app:endIconTint="@color/purple_500"
+        app:errorIconDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:errorIconDrawable="@null"
         tools:ignore="MissingConstraints">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:inputType="textPassword"
-            android:textSize="18sp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -266,7 +185,7 @@
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.898" />
+        app:layout_constraintVertical_bias="0.822" />
 
     <TextView
         android:id="@+id/text_have_acc"

@@ -3,7 +3,7 @@ package com.example.alertmeapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,10 +20,10 @@ import com.example.alertmeapp.api.requests.UserSignUpRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.utils.FactoryAnimation;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,7 +37,9 @@ public class SignUpActivity extends AppCompatActivity {
     private TextInputLayout tilLastName;
     private TextInputLayout tilPassword;
     private TextInputLayout tilRepeatedPassword;
-    private TextInputLayout tilSummaryErrors;
+
+    private static final String EMPTY_FIELD = "Field cannot be empty";
+    private static final int USER_ALREADY_EXISTS_CODE = 12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +53,11 @@ public class SignUpActivity extends AppCompatActivity {
         tilLastName = findViewById(R.id.til_last_name);
         tilPassword = findViewById(R.id.til_password);
         tilRepeatedPassword = findViewById(R.id.til_repeated_password);
-        tilSummaryErrors = findViewById(R.id.til_summary_errors);
         textHaveAcc.setOnClickListener(v -> changeActivityTo(SignInActivity.class));
 
         signUp.setOnClickListener(v -> {
             signUp.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
-            if (validateInputErrors()) {
+            if (validateFields()) {
                 requestToCreateNewUser();
             }
         });
@@ -69,8 +70,23 @@ public class SignUpActivity extends AppCompatActivity {
         call.enqueue(new Callback<ResponseSingleData<User>>() {
             @Override
             public void onResponse(Call<ResponseSingleData<User>> call, Response<ResponseSingleData<User>> response) {
-                if (response.isSuccessful())
+                if (response.isSuccessful()) {
+                    displayToast("User successfully created");
                     changeActivityTo(MainActivity.class);
+                } else {
+                    Gson gson = new Gson();
+                    try {
+                        ResponseSingleData errorResponse = gson.fromJson(
+                                response.errorBody().string(),
+                                ResponseSingleData.class);
+                        if (errorResponse.getErrorCode() == USER_ALREADY_EXISTS_CODE) {
+                            tilEmail.setError(" ");
+                            tilEmail.getEditText().setError("User already exists");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
@@ -88,6 +104,52 @@ public class SignUpActivity extends AppCompatActivity {
         return new UserSignUpRequest(email, firstName, lastName, "", password);
     }
 
+    private void setError(TextInputLayout til, String message) {
+        til.getEditText().setError(message);
+        til.setError(" ");
+    }
+
+    private boolean validateFields() {
+        cleanErrors();
+        boolean isValidate = true;
+        String email = tilEmail.getEditText().getText().toString();
+        String firstName = tilFirstName.getEditText().getText().toString();
+        String lastName = tilLastName.getEditText().getText().toString();
+        String password = tilPassword.getEditText().getText().toString();
+        String repeatedPassword = tilRepeatedPassword.getEditText().getText().toString();
+
+        if (email.isEmpty()) {
+            setError(tilEmail, EMPTY_FIELD);
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            setError(tilEmail, "Incorrect email");
+        }
+        if (firstName.isEmpty()) {
+            setError(tilFirstName, EMPTY_FIELD);
+            isValidate = false;
+        }
+        if (lastName.isEmpty()) {
+            setError(tilLastName, EMPTY_FIELD);
+            isValidate = false;
+        }
+        if (password.isEmpty()) {
+            setError(tilPassword, EMPTY_FIELD);
+            isValidate = false;
+        }
+        if (password.isEmpty()) {
+            setError(tilPassword, EMPTY_FIELD);
+            isValidate = false;
+        }
+        if (repeatedPassword.isEmpty()) {
+            setError(tilRepeatedPassword, EMPTY_FIELD);
+            isValidate = false;
+        } else if (!password.equals(repeatedPassword)) {
+            setError(tilRepeatedPassword, "Passwords do not match");
+            isValidate = false;
+        }
+
+        return isValidate;
+
+    }
 
     private void cleanErrors() {
         tilEmail.setErrorEnabled(false);
@@ -95,73 +157,6 @@ public class SignUpActivity extends AppCompatActivity {
         tilLastName.setErrorEnabled(false);
         tilPassword.setErrorEnabled(false);
         tilRepeatedPassword.setErrorEnabled(false);
-        tilSummaryErrors.setErrorEnabled(false);
-    }
-
-    private String buildOutputMessage(List<String> errorMessages) {
-        StringBuilder message = new StringBuilder();
-        for (int i = 0; i < errorMessages.size(); i++) {
-            String mess = errorMessages.get(i).toLowerCase();
-            message.append(mess);
-            if (i < errorMessages.size() - 1)
-                message.append(", ");
-        }
-        return message.toString();
-    }
-
-    private Optional<String> handleEmptyField(TextInputLayout til) {
-        if (TextUtils.isEmpty(til.getEditText().getText())) {
-            til.setErrorEnabled(true);
-            til.setError(" ");
-            return Optional.of(til.getEditText().getHint().toString());
-        }
-        return Optional.empty();
-    }
-
-    private Optional<String> handleInputEmail() {
-        String email = tilEmail.getEditText().getText().toString();
-        if (Patterns.EMAIL_ADDRESS.matcher(email).matches() || TextUtils.isEmpty(email))
-            return Optional.empty();
-        tilEmail.setErrorEnabled(true);
-        tilEmail.setError(" ");
-        return Optional.of("incorrect email");
-    }
-
-    private Optional<String> handleInputPasswords() {
-        String passwordStr = tilPassword.getEditText().getText().toString();
-        String repeatedPasswordStr = tilRepeatedPassword.getEditText().getText().toString();
-        if (!TextUtils.isEmpty(passwordStr) && !TextUtils.isEmpty(repeatedPasswordStr)) {
-            if (!repeatedPasswordStr.equals(passwordStr)) {
-                tilRepeatedPassword.setErrorEnabled(true);
-                tilRepeatedPassword.setError(" ");
-                return Optional.of("passwords must be the same");
-            }
-        }
-        return Optional.empty();
-    }
-
-    private void displayErrorMessage(List<String> errorMessages) {
-        tilSummaryErrors.setErrorEnabled(true);
-        tilSummaryErrors.setError(buildOutputMessage(errorMessages));
-    }
-
-
-    private boolean validateInputErrors() {
-        cleanErrors();
-        List<String> errorMessages = new ArrayList<>();
-        handleEmptyField(tilEmail).ifPresent(errorMessages::add);
-        handleEmptyField(tilFirstName).ifPresent(errorMessages::add);
-        handleEmptyField(tilLastName).ifPresent(errorMessages::add);
-        handleEmptyField(tilPassword).ifPresent(errorMessages::add);
-        handleEmptyField(tilRepeatedPassword).ifPresent(errorMessages::add);
-        if (!errorMessages.isEmpty())
-            errorMessages.set(0, "Enter " + errorMessages.get(0));
-
-        handleInputEmail().ifPresent(errorMessages::add);
-        handleInputPasswords().ifPresent(errorMessages::add);
-        displayErrorMessage(errorMessages);
-
-        return errorMessages.isEmpty();
     }
 
     private void changeActivityTo(Class<?> activity) {

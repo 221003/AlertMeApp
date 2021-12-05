@@ -111,7 +111,10 @@ public abstract class ListFragmentAbstract extends Fragment {
                     items.sort(new DistanceComparator());
                     adapter = new ListRecyclerViewAdapter(getActivity(), items);
                     recyclerView.setAdapter(adapter);
-                    filterAlertListBasedOnCategory(categorySpinner.getSelectedItem().toString());
+                    if (categorySpinner.getSelectedItem() != null) {
+                        filterAlertListBasedOnCategory(categorySpinner.getSelectedItem().toString());
+                    }
+
                     adapter.notifyDataSetChanged();
                 } else {
                     System.out.println("Unsuccessful to fetch all alerts AlertContent.class");

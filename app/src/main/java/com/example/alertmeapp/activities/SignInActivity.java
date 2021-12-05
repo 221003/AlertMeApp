@@ -43,13 +43,12 @@ import retrofit2.Response;
 
 public class SignInActivity extends AppCompatActivity {
 
-    private final String INVALID_EMAIL = "Email invalid";
-    private final String EMPTY_PASSWORD = "Empty password field";
-    private final String EMPTY_EMAIL = "Empty email field";
-    private final int INT_START = 20;
-    private final int INT_END = 32;
-    private final int INCORRECT_PASSWORD_CODE = 10;
-    private final int INCORRECT_LOGIN_CODE = 11;
+    private static final String INVALID_EMAIL = "Email invalid";
+    private static final String EMPTY_FIELD = "Field cannot be empty";
+    private static final int INT_START = 20;
+    private static final int INT_END = 32;
+    private static final int INCORRECT_PASSWORD_CODE = 10;
+    private static final int INCORRECT_LOGIN_CODE = 11;
 
     private TextInputLayout tilEmail;
     private TextInputLayout tilPassword;
@@ -106,13 +105,18 @@ public class SignInActivity extends AppCompatActivity {
         String password = tilPassword.getEditText().getText().toString();
         boolean isEmailValid = validateEmail(email);
 
-        if (email.isEmpty())
-            tilEmail.setError(EMPTY_EMAIL);
-        else if (!isEmailValid)
-            tilEmail.setError(INVALID_EMAIL);
+        if (email.isEmpty()) {
+            tilEmail.getEditText().setError(EMPTY_FIELD);
+            tilEmail.setError(" ");
+        } else if (!isEmailValid) {
+            tilEmail.getEditText().setError(INVALID_EMAIL);
+            tilEmail.setError(" ");
+        }
 
-        if (password.isEmpty())
-            tilPassword.setError(EMPTY_PASSWORD);
+        if (password.isEmpty()) {
+            tilPassword.getEditText().setError(EMPTY_FIELD);
+            tilPassword.setError(" ");
+        }
 
         if (isEmailValid && !email.isEmpty() && !password.isEmpty())
             requestToSignInUser(email, password);
@@ -160,16 +164,21 @@ public class SignInActivity extends AppCompatActivity {
 
     private void handleErrorLogIn(Response<ResponseSingleData<User>> response) {
         try {
+            tilEmail.setError("");
+            tilPassword.setError("");
             Gson gson = new Gson();
             ResponseSingleData errorResponse = gson.fromJson(
                     response.errorBody().string(),
                     ResponseSingleData.class);
             int errorCode = errorResponse.getErrorCode();
             String errorMessage = errorResponse.getError();
-            if (errorCode == INCORRECT_LOGIN_CODE)
-                tilEmail.setError(errorMessage);
-            else if (errorCode == INCORRECT_PASSWORD_CODE)
-                tilPassword.setError(errorMessage);
+            if (errorCode == INCORRECT_LOGIN_CODE) {
+                tilEmail.setError(" ");
+                tilEmail.getEditText().setError(errorMessage);
+            } else if (errorCode == INCORRECT_PASSWORD_CODE) {
+                tilPassword.setError(" ");
+                tilPassword.getEditText().setError(errorMessage);
+            }
         } catch (IOException e) {
             displayToast();
         }
