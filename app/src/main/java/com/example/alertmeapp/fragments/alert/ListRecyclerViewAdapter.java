@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -19,21 +20,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.data.Vote;
-import com.example.alertmeapp.api.requests.AlertRequest;
 import com.example.alertmeapp.api.requests.VoteRequest;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.AlertMeServiceImpl;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.material.card.MaterialCardView;
-import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
 
-import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,18 +40,27 @@ import retrofit2.Response;
 public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.ViewHolder> {
 
     private final FragmentActivity activity;
-    private final List<AlertItem> alertList;
+    private List<AlertItem> alertList;
     private final PorterDuffColorFilter GREEN = new PorterDuffColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
     private final PorterDuffColorFilter RED = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     private final PorterDuffColorFilter GRAY = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
     private final AlertMeService service = RestAdapter.getAlertMeService();
     private AlertMeServiceImpl alertMeServiceImpl = new AlertMeServiceImpl();
-    private final long USER_ID = 1L;
+    private final long USER_ID = LoggedInUser.getLoggedUser().getId();
+    private ViewHolder holder;
 
 
     public MyListRecyclerViewAdapter(FragmentActivity activity, List<AlertItem> items) {
         this.alertList = items;
         this.activity = activity;
+    }
+
+    public void setAlertList(List<AlertItem> alertList) {
+        this.alertList = alertList;
+    }
+
+    public List<AlertItem> getAlertList() {
+        return alertList;
     }
 
     @NonNull
@@ -66,6 +73,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        this.holder = holder;
         Alert alert = alertList.get(position).getAlert();
         String distance = alertList.get(position).getDistance();
 
@@ -78,17 +86,48 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.upvote.setColorFilter(GRAY);
         holder.downvote.setColorFilter(GRAY);
         findVote(new VoteRequest(alert.getId(), USER_ID), holder);
-        holder.titleView.setOnClickListener(v -> openAlertDetails(alert.getId(), holder.titleView));
+        holder.titleView.setOnClickListener(v -> openAlertDetails(alert.getId(), position));
         holder.upvote.setOnClickListener(v -> handleUpVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
         holder.downvote.setOnClickListener(v -> handleDownVote(holder.upvote, holder.downvote, holder.alertVotes, alert));
     }
 
-    private void openAlertDetails(long id, TextView titleView) {
-        titleView.requestFocus();
-        Bundle bundle = new Bundle();
-        bundle.putLong("alertId", id);
-        NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
-        navController.navigate(R.id.alertDetailsFragment, bundle);
+    private void displayToast(String message) {
+        Toast.makeText(activity, message,
+                Toast.LENGTH_LONG).show();
+    }
+
+
+    private boolean openAlertDetails(long alertId, int localPosition) {
+
+        Call<ResponseSingleData<Alert>> alert = service.getAlert(alertId);
+        alert.enqueue(new Callback<ResponseSingleData<Alert>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleData<Alert>> call, Response<ResponseSingleData<Alert>> response) {
+                System.out.println();
+                if (response.isSuccessful() && response.body() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("alert", response.body().getData());
+                    NavController navController = Navigation.findNavController(activity, R.id.fragmentController);
+                    navController.navigate(R.id.alertDetailsFragment, bundle);
+                } else {
+                    displayToast("This alert no longer exists");
+                    Iterator<AlertItem> iterator = alertList.iterator();
+                    while (iterator.hasNext()) {
+                        if (iterator.next().getAlert().getId() == alertId) {
+                            iterator.remove();
+                            notifyItemRemoved(localPosition);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleData<Alert>> call, Throwable t) {
+                System.out.println("Failed to fetch the alert");
+            }
+        });
+
+        return true;
     }
 
     private int getColorBasedOnAlertType(String alertType) {
