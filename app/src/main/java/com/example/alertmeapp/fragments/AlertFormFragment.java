@@ -109,7 +109,6 @@ public class AlertFormFragment extends Fragment {
     private Double longitude;
     private Double latitude;
     private String categoryItemName = null;
-    private String imageByteArray;
 
     private final AlertMeService service = RestAdapter.getAlertMeService();
     private AlertMeServiceImpl alertMeServiceImpl = new AlertMeServiceImpl();
@@ -181,7 +180,6 @@ public class AlertFormFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getNewAlertCords();
-
         if (getCreateAlert() != null || getAlertDuplicateId() != null) {
             handleDuplicate();
         }
@@ -199,7 +197,7 @@ public class AlertFormFragment extends Fragment {
         if (alertDuplicateId != null) {
             if (alertDuplicateId.equals(String.valueOf(NO_DUPLICATE_VALUE))) {
                 AlertRequest alertRequest = createAlertRequestFromForm();
-                requestToSaveAlert(alertRequest);
+                 requestToSaveAlert(alertRequest);
             } else {
                 incrementVoteCountOfAlert(alertDuplicateId);
             }
@@ -243,7 +241,7 @@ public class AlertFormFragment extends Fragment {
                 .withLatitude(latitude)
                 .withLongitude(longitude)
                 .withNumberOfVotes(0)
-                .withImage(imageByteArray)
+                .withImage(getUploadedPhotoBytesArray())
                 .build();
         return alertRequest;
     }
@@ -453,7 +451,6 @@ public class AlertFormFragment extends Fragment {
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             uploadedPhotoView.setImageBitmap(imageBitmap);
             showUploadedPhoto();
-            imageByteArray = getUploadedPhotoBytesArray();
         }
     }
 
