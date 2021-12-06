@@ -63,4 +63,6 @@ public interface AlertMeService {
     @PUT("/api/users/{id}/alerts")
     Call<ResponseMultipleData<Alert>> getUserAlerts(@Path("id") Long id);
 
+    @DELETE("/api/alerts/{id}")
+    Call<ResponseBody> deleteAlert(@Path("id") Long id);
 }

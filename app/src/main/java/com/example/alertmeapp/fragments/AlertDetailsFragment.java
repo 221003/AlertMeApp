@@ -11,19 +11,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.alertmeapp.R;
 import com.example.alertmeapp.api.data.Alert;
 import com.example.alertmeapp.api.responses.ResponseSingleData;
 import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
+import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -32,6 +37,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -68,7 +74,43 @@ public class AlertDetailsFragment extends Fragment {
         });
 
         Bundle args = getArguments();
-        populateFragmentView((Alert) args.getSerializable("alert"));
+        Alert alert = (Alert) args.getSerializable("alert");
+        initDeleteButton(alert);
+        populateFragmentView(alert);
+    }
+
+    private void initDeleteButton(Alert alert) {
+        Button deleteButton = getView().findViewById(R.id.delete_button);
+        if (alert.getUser().getId() != LoggedInUser.getInstance(null, null, null).getId()) {
+            deleteButton.setVisibility(View.INVISIBLE);
+        } else {
+            deleteButton.setOnClickListener((click) -> {
+                AlertMeService service = RestAdapter.getAlertMeService();
+                Call<ResponseBody> deleteRequest = service.deleteAlert(Long.valueOf(alert.getId()));
+                deleteRequest.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            displayToast("Alert deleted");
+                            NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                            navController.navigate(R.id.mapsFragment);
+                        } else {
+                            displayToast("Unsuccessful to delete alert");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        displayToast("Failed to delete alert");
+                    }
+                });
+            });
+        }
+    }
+
+    private void displayToast(String message) {
+        Toast.makeText(getContext(), message,
+                Toast.LENGTH_LONG).show();
     }
 
     private void populateFragmentView(Alert alert) {

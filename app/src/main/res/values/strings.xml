@@ -47,4 +47,5 @@
     <string name="details_distance_to">Distance to</string>
     <string name="details_votes">Votes</string>
     <string name="details_description">Description</string>
+    <string name="alert_delete">Delete</string>
 </resources>
