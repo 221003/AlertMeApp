@@ -14,6 +14,7 @@ import com.example.alertmeapp.api.retrofit.AlertMeService;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 
 import com.example.alertmeapp.fragments.alert.AlertItem;
+import com.example.alertmeapp.utils.DistanceCalculatorFromUser;
 import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.LoggedInUser;
 
@@ -29,7 +30,7 @@ public class AlertDuplicateContent {
     private final RecyclerView recyclerView;
     private final List<AlertItem> items;
 
-    private final Integer RANGE_OF_DUPLICATE_ALERTS_IN_METERS = 2000;
+    public static final Integer RANGE_OF_DUPLICATE_ALERTS_IN_METERS = 2000;
     private final Double latitude;
     private final Double longitude;
     private final String alertName;
@@ -57,9 +58,6 @@ public class AlertDuplicateContent {
             public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
                 if (response.isSuccessful()) {
                     filterList(response, alertName);
-                    if (items.size() == 0) {
-                        handleNoDuplicates();
-                    }
                 } else {
                     System.out.println("Unsuccessful to fetch all alerts AlertContent.class");
                 }
@@ -89,7 +87,7 @@ public class AlertDuplicateContent {
 
         alerts.stream()
                 .filter((alert -> alert.getAlertType().getName().equals(alertType)))
-                .forEach(alert -> temp.add(new AlertItem(alert, countDistance(alert.getLongitude(), alert.getLatitude()))));
+                .forEach(alert -> temp.add(new AlertItem(alert, DistanceCalculatorFromUser.count(alert.getLongitude(), alert.getLatitude()))));
 
         if (items.size() != temp.size()) {
             items.clear();
@@ -98,27 +96,6 @@ public class AlertDuplicateContent {
         items.sort(new DistanceComparator());
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
-    }
-
-    private String countDistance(double longitude, double latitude) {
-        LoggedInUser user = LoggedInUser.getInstance(null, null, null);
-
-        Location userLocation = new Location("point A");
-        userLocation.setLatitude(user.getLastLatitude());
-        userLocation.setLongitude(user.getLastLongitude());
-
-        Location alertLocation = new Location("point B");
-        alertLocation.setLatitude(latitude);
-        alertLocation.setLongitude(longitude);
-
-        float distance = userLocation.distanceTo(alertLocation);
-        String res;
-        if (distance > 1000) {
-            res = Math.round(distance / 1000) + " km";
-        } else {
-            res = Math.round(distance) + " m";
-        }
-        return res;
     }
 
 }
