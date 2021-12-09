@@ -9,11 +9,14 @@ public class User {
     private String fistName;
     @SerializedName("last_name")
     private String lastName;
+    @SerializedName("turn_off_notifications")
+    private boolean turnOffNotifications;
 
-    public User(Long id, String fistName, String lastName) {
+    public User(Long id, String fistName, String lastName, boolean turnOffNotifications) {
         this.id = id;
         this.fistName = fistName;
         this.lastName = lastName;
+        this.turnOffNotifications = turnOffNotifications;
     }
 
     public Long getId() {
@@ -38,6 +41,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public boolean isTurnOffNotifications() {
+        return turnOffNotifications;
+    }
+
+    public void setTurnOffNotifications(boolean turnOffNotifications) {
+        this.turnOffNotifications = turnOffNotifications;
     }
 
     @Override

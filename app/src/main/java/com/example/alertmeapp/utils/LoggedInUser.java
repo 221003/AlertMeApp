@@ -10,11 +10,13 @@ public class LoggedInUser {
     private String lastName;
     private Double lastLongitude;
     private Double lastLatitude;
+    private boolean turnOffNotifications;
 
     private LoggedInUser(User user, Double longitude, Double latitude) {
         this.id = user.getId();
         this.fistName = user.getFistName();
         this.lastName = user.getLastName();
+        this.turnOffNotifications = user.isTurnOffNotifications();
         this.lastLongitude = longitude;
         this.lastLatitude = latitude;
     }
@@ -72,5 +74,13 @@ public class LoggedInUser {
 
     public void setLastLatitude(Double lastLatitude) {
         this.lastLatitude = lastLatitude;
+    }
+
+    public boolean isTurnOffNotifications() {
+        return turnOffNotifications;
+    }
+
+    public void setTurnOffNotifications(boolean turnOffNotifications) {
+        this.turnOffNotifications = turnOffNotifications;
     }
 }
