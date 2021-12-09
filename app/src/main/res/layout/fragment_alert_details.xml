@@ -26,17 +26,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <android.widget.Button
+            <ImageView
                 android:id="@+id/delete_button"
-                android:layout_width="100dp"
-                android:layout_height="30dp"
-                android:background="@drawable/button_background2"
-                android:text="@string/alert_delete"
-                android:textColor="@color/white"
-                android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:minWidth="30sp"
+                android:minHeight="30sp"
+                android:src="@drawable/delete_4ever"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="MissingConstraints" />
+
+            <!--            <android.widget.Button-->
+<!--                android:id="@+id/delete_button"-->
+<!--                android:layout_width="100dp"-->
+<!--                android:layout_height="30dp"-->
+<!--                android:layout_marginEnd="156dp"-->
+<!--                android:background="@drawable/button_background2"-->
+<!--                android:text="@string/alert_delete"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="15sp"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -67,11 +81,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_title" />
-
-                <TextView
                     android:id="@+id/details_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -85,11 +94,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_type" />
 
                 <TextView
                     android:id="@+id/details_alert_type"
@@ -107,11 +111,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_author" />
-
-                <TextView
                     android:id="@+id/details_author"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,11 +124,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_location" />
 
                 <TextView
                     android:id="@+id/details_location"
@@ -147,11 +141,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_distance_to" />
-
-                <TextView
                     android:id="@+id/details_distance_to"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -167,11 +156,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_votes" />
-
-                <TextView
                     android:id="@+id/details_votes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -185,11 +169,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="50dp"
                 android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/details_description" />
 
                 <TextView
                     android:id="@+id/details_description"

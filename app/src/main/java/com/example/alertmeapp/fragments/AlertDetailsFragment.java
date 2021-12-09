@@ -80,7 +80,7 @@ public class AlertDetailsFragment extends Fragment {
     }
 
     private void initDeleteButton(Alert alert) {
-        Button deleteButton = getView().findViewById(R.id.delete_button);
+        ImageView deleteButton = getView().findViewById(R.id.delete_button);
         if (alert.getUser().getId() != LoggedInUser.getInstance(null, null, null).getId()) {
             deleteButton.setVisibility(View.INVISIBLE);
         } else {
