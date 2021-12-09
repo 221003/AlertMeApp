@@ -98,6 +98,7 @@ public class AlertFormFragment extends Fragment {
     private TextView photoUploadInfoView;
     private ConstraintLayout photoUploadLayout;
     private TextView localizationInvalid;
+    private String base64En;
 
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -135,6 +136,7 @@ public class AlertFormFragment extends Fragment {
 
         buttonUploader.setOnClickListener(v -> {
             buttonUploader.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            base64En = getUploadedPhotoBytesArray();
             onCheckDuplicates(v);
         });
 
@@ -245,7 +247,7 @@ public class AlertFormFragment extends Fragment {
                 .withLatitude(latitude)
                 .withLongitude(longitude)
                 .withNumberOfVotes(0)
-                .withImage(getUploadedPhotoBytesArray())
+                .withImage(base64En)
                 .build();
         return alertRequest;
     }
@@ -328,6 +330,10 @@ public class AlertFormFragment extends Fragment {
             isValidate = false;
             descriptionView.setError(INVALID_DESCRIPTION);
         }
+
+        System.out.println("CHECK LOCALIZATIONS. . . . . - >  >  ");
+        System.out.println(longitude);
+        System.out.println(latitude);
 
         if (longitude == null || latitude == null || latitude == LOCATION_NOT_SET || longitude == LOCATION_NOT_SET) {
             localizationInvalid.setText(INVALID_LOCALIZATION);
@@ -425,6 +431,7 @@ public class AlertFormFragment extends Fragment {
             Bitmap bitmap = drawable.getBitmap();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            base64En = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
         } else {
             return null;

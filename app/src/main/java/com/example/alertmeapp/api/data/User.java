@@ -2,7 +2,9 @@ package com.example.alertmeapp.api.data;
 
 import com.google.gson.annotations.SerializedName;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private Long id;
     @SerializedName("first_name")
