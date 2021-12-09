@@ -5,6 +5,7 @@ import com.example.alertmeapp.api.data.Vote;
 import com.example.alertmeapp.api.requests.AlertRequest;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.data.User;
+import com.example.alertmeapp.api.requests.ChangePasswordRequest;
 import com.example.alertmeapp.api.requests.UserSignInRequest;
 import com.example.alertmeapp.api.requests.UserSignUpRequest;
 
@@ -65,4 +66,10 @@ public interface AlertMeService {
 
     @DELETE("/api/alerts/{id}")
     Call<ResponseBody> deleteAlert(@Path("id") Long id);
+
+    @PUT("/api/users/{id}/change-password")
+    Call<ResponseSingleData<User>> changeUserPassword(@Body ChangePasswordRequest changePasswordRequest, @Path("id") Long id);
+
+    @PUT("/api/users/{id}/switch-notification")
+    Call<ResponseSingleData<User>> switchUserNotifications(@Path("id") Long id);
 }
