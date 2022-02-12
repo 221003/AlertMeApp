@@ -1,6 +1,8 @@
 package com.example.alertmeapp.api.data;
 
-public class AlertType {
+import java.io.Serializable;
+
+public class AlertType implements Serializable {
     private Long id;
     private String name;
 

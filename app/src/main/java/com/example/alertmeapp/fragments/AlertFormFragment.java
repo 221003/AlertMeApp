@@ -4,6 +4,8 @@ package com.example.alertmeapp.fragments;
 import static android.app.Activity.RESULT_OK;
 
 
+import static com.example.alertmeapp.fragments.duplicate.list.AlertDuplicateContent.RANGE_OF_DUPLICATE_ALERTS_IN_METERS;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +22,6 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -50,6 +51,9 @@ import com.example.alertmeapp.api.retrofit.AlertMeServiceImpl;
 import com.example.alertmeapp.api.retrofit.RestAdapter;
 import com.example.alertmeapp.api.data.AlertType;
 import com.example.alertmeapp.api.responses.ResponseMultipleData;
+import com.example.alertmeapp.fragments.alert.AlertItem;
+import com.example.alertmeapp.utils.DistanceCalculatorFromUser;
+import com.example.alertmeapp.utils.DistanceComparator;
 import com.example.alertmeapp.utils.FactoryAnimation;
 import com.example.alertmeapp.utils.LoggedInUser;
 import com.google.android.material.textfield.TextInputEditText;
@@ -94,6 +98,7 @@ public class AlertFormFragment extends Fragment {
     private TextView photoUploadInfoView;
     private ConstraintLayout photoUploadLayout;
     private TextView localizationInvalid;
+    private String base64En;
 
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -109,7 +114,6 @@ public class AlertFormFragment extends Fragment {
     private Double longitude;
     private Double latitude;
     private String categoryItemName = null;
-    private String imageByteArray;
 
     private final AlertMeService service = RestAdapter.getAlertMeService();
     private AlertMeServiceImpl alertMeServiceImpl = new AlertMeServiceImpl();
@@ -132,6 +136,7 @@ public class AlertFormFragment extends Fragment {
 
         buttonUploader.setOnClickListener(v -> {
             buttonUploader.startAnimation(FactoryAnimation.createButtonTouchedAnimation());
+            base64En = getUploadedPhotoBytesArray();
             onCheckDuplicates(v);
         });
 
@@ -181,7 +186,6 @@ public class AlertFormFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getNewAlertCords();
-
         if (getCreateAlert() != null || getAlertDuplicateId() != null) {
             handleDuplicate();
         }
@@ -243,7 +247,7 @@ public class AlertFormFragment extends Fragment {
                 .withLatitude(latitude)
                 .withLongitude(longitude)
                 .withNumberOfVotes(0)
-                .withImage(imageByteArray)
+                .withImage(base64En)
                 .build();
         return alertRequest;
     }
@@ -327,6 +331,10 @@ public class AlertFormFragment extends Fragment {
             descriptionView.setError(INVALID_DESCRIPTION);
         }
 
+        System.out.println("CHECK LOCALIZATIONS. . . . . - >  >  ");
+        System.out.println(longitude);
+        System.out.println(latitude);
+
         if (longitude == null || latitude == null || latitude == LOCATION_NOT_SET || longitude == LOCATION_NOT_SET) {
             localizationInvalid.setText(INVALID_LOCALIZATION);
             isValidate = false;
@@ -335,16 +343,63 @@ public class AlertFormFragment extends Fragment {
         return isValidate;
     }
 
+    private void getAlertWithCategoryAndFillViewWithIt(String alertName) {
+        AlertMeService service = RestAdapter.getAlertMeService();
+        Call<ResponseMultipleData<Alert>> allAlerts = service.getAlertByDistance(latitude, longitude, Double.valueOf(RANGE_OF_DUPLICATE_ALERTS_IN_METERS));
+        allAlerts.enqueue(new Callback<ResponseMultipleData<Alert>>() {
+
+            @Override
+            public void onResponse(Call<ResponseMultipleData<Alert>> call, Response<ResponseMultipleData<Alert>> response) {
+                if (response.isSuccessful()) {
+                    List<AlertItem> alertItems = filterList(response, alertName);
+                    if (alertItems.size() == 0) {
+                        AlertRequest alertRequest = createAlertRequestFromForm();
+                        requestToSaveAlert(alertRequest);
+                    } else {
+                        String category = categorySpinner.getSelectedItem().toString();
+                        Bundle bundle = new Bundle();
+                        bundle.putDouble("longitude", longitude);
+                        bundle.putDouble("latitude", latitude);
+                        bundle.putString("alertName", getSelectedCategoryAlertType(category).getName() == null
+                                ? alertTypeRequests.get(0).getName() : getSelectedCategoryAlertType(category).getName());
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
+                        navController.navigate(R.id.duplicateFragment, bundle);
+                    }
+                } else {
+                    System.out.println("Unsuccessful to fetch all alerts AlertContent.class");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseMultipleData<Alert>> call, Throwable t) {
+                System.out.println("Failed to fetch all alerts AlertContent.class");
+            }
+        });
+    }
+
+    private List<AlertItem> filterList(Response<ResponseMultipleData<Alert>> response, String alertType) {
+        List<AlertItem> items = new ArrayList<>();
+        List<Alert> alerts = response.body().getData();
+        List<AlertItem> temp = new ArrayList();
+
+        alerts.stream()
+                .filter((alert -> alert.getAlertType().getName().equals(alertType)))
+                .forEach(alert -> temp.add(new AlertItem(alert, DistanceCalculatorFromUser.count(alert.getLongitude(), alert.getLatitude()))));
+
+        if (items.size() != temp.size()) {
+            items.clear();
+            items.addAll(temp);
+        }
+        items.sort(new DistanceComparator());
+        return items;
+    }
+
     public void onCheckDuplicates(View view) {
         if (isNewAlertValid()) {
-            Bundle bundle = new Bundle();
             String category = categorySpinner.getSelectedItem().toString();
-            bundle.putDouble("longitude", longitude);
-            bundle.putDouble("latitude", latitude);
-            bundle.putString("alertName", getSelectedCategoryAlertType(category).getName() == null
+
+            getAlertWithCategoryAndFillViewWithIt(getSelectedCategoryAlertType(category).getName() == null
                     ? alertTypeRequests.get(0).getName() : getSelectedCategoryAlertType(category).getName());
-            NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
-            navController.navigate(R.id.duplicateFragment, bundle);
         }
     }
 
@@ -354,6 +409,7 @@ public class AlertFormFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    System.out.println(getActivity() == null ? "jestem" : "nie jestem");
                     NavController navController = Navigation.findNavController(getActivity(), R.id.fragmentController);
                     navController.navigate(R.id.mapsFragment);
                     displayToast("Alert added");
@@ -375,6 +431,7 @@ public class AlertFormFragment extends Fragment {
             Bitmap bitmap = drawable.getBitmap();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            base64En = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
         } else {
             return null;
@@ -453,7 +510,6 @@ public class AlertFormFragment extends Fragment {
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             uploadedPhotoView.setImageBitmap(imageBitmap);
             showUploadedPhoto();
-            imageByteArray = getUploadedPhotoBytesArray();
         }
     }
 
